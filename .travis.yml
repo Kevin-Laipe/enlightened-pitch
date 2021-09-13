@@ -4,5 +4,8 @@ python:
 install:
   - pip install pipenv
   - pipenv install --dev
+before_script:
+  - touch .env
+  - echo SECRET_KEY=$SECRET_KEY >> .env
 script:
   - pytest
