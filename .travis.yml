@@ -11,6 +11,9 @@ env:
 before_script:
   - touch .env
   - echo SECRET_KEY=$SECRET_KEY >> .env
-  - psql -c 'create database enlightenedpitchdb;' -U postgres
+  - psql -c 'CREATE USER kevin WITH PASSWORD kevin;' -U postgres
+  - psql -c 'CREATE DATABASE enlightenedpitchdb;' -U postgres
 script:
+  - python manage.py makemigrations
+  - python manage.py migrate
   - pytest
