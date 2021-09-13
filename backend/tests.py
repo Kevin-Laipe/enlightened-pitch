@@ -1,8 +1,9 @@
 from django.test import TestCase
 import pytest
-from django.contrib.auth.models import User
+from .models import Set
 
 @pytest.mark.django_db
-def test_user_create():
-  User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
-  assert User.objects.count() == 1
+def test_set_create():
+    s = Set(name="Welcome to Rathe", tag="WTR")
+    s.save()
+    assert Set.objects.count() == 1
