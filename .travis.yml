@@ -4,10 +4,13 @@ python:
 install:
   - pip install pipenv
   - pipenv install --dev
+services:
+  - postgresql
 env:
   - SECRET_KEY=lba%2wx*46d$ga$2fwywc#gxyda4m589$pxbptm5rir_uuj8a2
 before_script:
   - touch .env
   - echo SECRET_KEY=$SECRET_KEY >> .env
+  - psql -c 'create database travis_ci_test;' -U postgres
 script:
   - pytest
