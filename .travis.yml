@@ -12,10 +12,8 @@ before_script:
   - touch .env
   - echo SECRET_KEY=$SECRET_KEY >> .env
   - sudo su postgres -c psql
-  - CREATE USER kevin WITH PASSWORD 'kevin';
-  - CREATE DATABASE enlightenedpitchdb;
-  - ALTER ROLE kevin WITH CREATEDB;
-  - \q
+  - psql -c "CREATE USER kevin WITH PASSWORD 'kevin';" -U postgres
+  - psql -c "CREATE DATABASE enlightenedpitchdb;" -U postgres
 script:
   - python manage.py makemigrations
   - python manage.py migrate
