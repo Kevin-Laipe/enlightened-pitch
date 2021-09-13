@@ -12,6 +12,7 @@ before_script:
   - touch .env
   - echo SECRET_KEY=$SECRET_KEY >> .env
   - psql -c "CREATE USER kevin WITH PASSWORD 'kevin';" -U postgres
+  - psql -c "ALTER USER kevin CREATEDB;" -U postgres
   - psql -c "CREATE DATABASE enlightenedpitchdb;" -U postgres
 script:
   - python manage.py makemigrations
