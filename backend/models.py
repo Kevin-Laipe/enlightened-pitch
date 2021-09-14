@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.fields import SmallIntegerField
 from django.utils.translation import gettext_lazy as _
 
 def image_directory_path(instance, filename):
@@ -113,3 +114,4 @@ class CardReleasenote(models.Model):
 class CardStat(models.Model):
     card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
     stat_id = models.ForeignKey('Stat', on_delete=models.CASCADE)
+    value = models.SmallIntegerField
