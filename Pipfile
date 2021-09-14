@@ -10,7 +10,7 @@ djangorestframework = "*"
 django-environ = "*"
 pytest = "*"
 pytest-django = "*"
-python-coveralls = "*"
+coveralls = "*"
 
 [dev-packages]
 
