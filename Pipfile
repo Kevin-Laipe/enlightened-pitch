@@ -11,6 +11,7 @@ django-environ = "*"
 pytest = "*"
 pytest-django = "*"
 coveralls = "*"
+pillow = "*"
 
 [dev-packages]
 
