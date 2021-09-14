@@ -114,4 +114,4 @@ class CardReleasenote(models.Model):
 class CardStat(models.Model):
     card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
     stat_id = models.ForeignKey('Stat', on_delete=models.CASCADE)
-    value = models.SmallIntegerField
+    value = models.SmallIntegerField()
