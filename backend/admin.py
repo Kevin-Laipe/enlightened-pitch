@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Card, Printing, Set, Keyword, Subtype, Talent, Releasenote, Stat, CardKeyword, CardSubtype, CardTalent, CardReleasenote,CardStat
+from .models import Card, Printing, Set, Keyword, Subtype, Talent, Releasenote, Stat, CardKeyword, CardSubtype, CardTalent, CardReleasenote, CardStat, User, Copy, Deck, DeckCard
 
 admin.site.register(Card)
 admin.site.register(Printing)
@@ -15,3 +15,7 @@ admin.site.register(CardSubtype)
 admin.site.register(CardTalent)
 admin.site.register(CardReleasenote)
 admin.site.register(CardStat)
+admin.site.register(User)
+admin.site.register(Copy)
+admin.site.register(Deck)
+admin.site.register(DeckCard)
