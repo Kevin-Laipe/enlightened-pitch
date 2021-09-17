@@ -17,6 +17,6 @@ before_script:
 script:
   - python manage.py makemigrations
   - python manage.py migrate
-  - pytest
+  - coverage run -m pytest
 after_success:
   - coveralls

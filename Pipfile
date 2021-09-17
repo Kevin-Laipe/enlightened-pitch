@@ -12,6 +12,7 @@ pytest = "*"
 pytest-django = "*"
 coveralls = "*"
 pillow = "*"
+coverage = "*"
 
 [dev-packages]
 
