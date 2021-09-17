@@ -1,17 +1,25 @@
-from django.test import TestCase
 import pytest
-from .models import Set
-
+from django.test import TestCase
+from django.db.utils import DataError
 from django.contrib.auth import get_user_model
 
+from .models import Set
+
 @pytest.mark.django_db
-def test_set_create():
-    s = Set(name="Welcome to Rathe", tag="WTR")
-    s.save()
-    assert Set.objects.count() == 1
+class TestSets:
+    def test_set_create(self):
+        s = Set.objects.create(name="Welcome to Rathe", tag="WTR")
+        s.save()
+        assert Set.objects.count() == 1
+
+    def test_set_tag_too_long(self):
+        with pytest.raises(DataError, match=".* too long .*"):
+            s = Set.objects.create(name="Iorem Set", tag="IOREMIPSUM")
+
+    def test_set_empty_fields(self):
+        pass # TODO: Use drf to ensure that empty fields won't exist in the db
 
 class UsersManagersTests(TestCase):
-
     def test_create_user(self):
         User = get_user_model()
         user = User.objects.create_user(email='normal@user.com', password='foo')
