@@ -37,7 +37,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
-#AUTH_USER_MODEL = 'backend.User'
+AUTH_USER_MODEL = 'backend.User'
 
 # Application definition
 
