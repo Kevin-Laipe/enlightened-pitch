@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models import constraints
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -31,7 +32,7 @@ class Releasenote(models.Model):
     text = models.CharField(max_length=500)
 
 class Stat(models.Model):
-    ''' Pitch, cost, defense, attack '''
+    '''Cost, defense, attack '''
     name = models.CharField(max_length=10)
 
 class Supertype(models.Model):
@@ -97,11 +98,23 @@ class Card(models.Model):
         WEAPON = 6
         HERO = 7
 
+    class Pitch(models.IntegerChoices):
+        NONE = 0
+        RED = 1
+        YELLOW = 2
+        BLUE = 3
+
     name = models.CharField(max_length=50)
     text = models.CharField(max_length=500)
     _class = models.IntegerField(choices=Class.choices)
     _type = models.IntegerField(choices=Type.choices)
+    pitch = models.IntegerField(choices=Pitch.choices)
     is_banned = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'pitch'], name='unique card')
+        ]
 
 class CardKeyword(models.Model):
     card_id = models.ForeignKey('Card', on_delete=models.CASCADE)

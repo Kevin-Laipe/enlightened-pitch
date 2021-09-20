@@ -1,9 +1,9 @@
 import pytest
 from django.test import TestCase
-from django.db.utils import DataError
+from django.db.utils import DataError, IntegrityError
 from django.contrib.auth import get_user_model
 
-from .models import Set
+from .models import Set, Card
 
 @pytest.mark.django_db
 class TestSets:
@@ -18,6 +18,21 @@ class TestSets:
 
     def test_set_empty_fields(self):
         pass # TODO: Use drf to ensure that empty fields won't exist in the db
+
+@pytest.mark.django_db
+class TestCards:
+    def test_card_create(self):
+        s = Card.objects.create(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ATTACK_ACTION, pitch=1)
+        s.save()
+        assert Card.objects.count() == 1
+        assert s.is_banned == False
+    
+    def test_card_unique(self):
+        s1 = Card.objects.create(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ATTACK_ACTION, pitch=1)
+        s1.save()
+        with pytest.raises(IntegrityError, match=".* violates unique constraint .*"):
+            s2 = Card.objects.create(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ATTACK_ACTION, pitch=1)
+            s2.save()
 
 class UsersManagersTests(TestCase):
     def test_create_user(self):
