@@ -1,10 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models import constraints
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from .managers import UserManager
+from .managers import UserManager, CardManager
 
 def image_directory_path(instance, filename):
     return 'images/{0}'.format(filename)
@@ -110,6 +109,8 @@ class Card(models.Model):
     _type = models.IntegerField(choices=Type.choices)
     pitch = models.IntegerField(choices=Pitch.choices)
     is_banned = models.BooleanField(default=False)
+
+    objects = CardManager()
 
     class Meta:
         constraints = [
