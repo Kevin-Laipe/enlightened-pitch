@@ -23,7 +23,7 @@ class Subtype(models.Model):
     name = models.CharField(max_length=20)
 
 class Talent(models.Model):
-    ''' Shadow, Light, Elemental, Ice, Lightning... '''
+    ''' Shadow, Light, Elemental... '''
     name = models.CharField(max_length=20)
 
 class Releasenote(models.Model):
@@ -32,6 +32,10 @@ class Releasenote(models.Model):
 
 class Stat(models.Model):
     ''' Pitch, cost, defense, attack '''
+    name = models.CharField(max_length=10)
+
+class Supertype(models.Model):
+    ''' Ice, Earth, Lightning... '''
     name = models.CharField(max_length=10)
 
 class Printing(models.Model):
@@ -119,6 +123,10 @@ class CardStat(models.Model):
     card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
     stat_id = models.ForeignKey('Stat', on_delete=models.CASCADE)
     value = models.SmallIntegerField()
+
+class CardSupertype(models.Model):
+    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
+    supertype_id = models.ForeignKey('Supertype', on_delete=models.CASCADE)
 
 class User(AbstractUser):
     username = None
