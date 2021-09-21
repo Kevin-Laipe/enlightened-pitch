@@ -16,7 +16,7 @@ class Set(models.Model):
 class Keyword(models.Model):
     ''' Go again, Dominate, Blade Break... '''
     name = models.CharField(max_length=20)
-    description = models.CharField(max_length=150)
+    description = models.CharField(max_length=500)
 
 class Subtype(models.Model):
     ''' (1H), Chest, Aura... '''
@@ -27,16 +27,16 @@ class Talent(models.Model):
     name = models.CharField(max_length=20)
 
 class Releasenote(models.Model):
-    ''' Rulling released by LSS upon a card's release '''
+    ''' Rullings released by LSS upon a card's release '''
     text = models.CharField(max_length=500)
 
 class Stat(models.Model):
     '''Cost, defense, attack '''
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=20)
 
 class Supertype(models.Model):
     ''' Ice, Earth, Lightning... '''
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=20)
 
 class Printing(models.Model):
     '''  '''
@@ -88,14 +88,13 @@ class Card(models.Model):
         ILLUSIONIST = 11
 
     class Type(models.IntegerChoices):
-        NON_ATTACK_ACTION = 0
-        ATTACK_ACTION = 1
-        ATTACK_REACTION = 2
-        DEFENSE_REACTION = 3
-        INSTANT = 4
-        EQUIPMENT = 5
-        WEAPON = 6
-        HERO = 7
+        ACTION = 0
+        ATTACK_REACTION = 1
+        DEFENSE_REACTION = 2
+        INSTANT = 3
+        EQUIPMENT = 4
+        WEAPON = 5
+        HERO = 6
 
     class Pitch(models.IntegerChoices):
         NONE = 0
@@ -142,21 +141,6 @@ class CardSupertype(models.Model):
     card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
     supertype_id = models.ForeignKey('Supertype', on_delete=models.CASCADE)
 
-class User(AbstractUser):
-    username = None
-    email = models.EmailField(_('email address'), unique=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(default=timezone.now)
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
-
-    objects = UserManager()
-
-    def __str__(self):
-        return self.email
-
 class Deck(models.Model):
     creator = models.ForeignKey('User', on_delete=models.CASCADE)
     description = models.TextField(max_length=5000)
@@ -173,3 +157,18 @@ class Copy(models.Model):
     amount_owned = models.PositiveSmallIntegerField()
     amount_wanted = models.PositiveSmallIntegerField()
     amount_trading = models.PositiveSmallIntegerField()
+
+class User(AbstractUser):
+    username = None
+    email = models.EmailField(_('email address'), unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(default=timezone.now)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
+
+    def __str__(self):
+        return self.email
