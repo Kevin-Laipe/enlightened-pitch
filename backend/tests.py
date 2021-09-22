@@ -42,7 +42,7 @@ class TestCards:
     def test_keyworded_cards_create(self):
         k1 = Keyword.objects.create(name='Go again', description='Gain an action point when the card resolves.')
         k1.save()
-        c = Card.objects.create_card(name='Open the Center', text='', _class=Card.Class.NINJA, _type=Card.Type.ACTION, pitch=1)
+        c = Card.objects.create_card(name='Open the Center', text='', _class=Card.Class.NINJA, _type=Card.Type.ACTION, pitch=Card.Pitch.RED)
         c.save()
         ck1 = CardKeyword.objects.create(card=c, keyword=k1)
         ck1.save()
@@ -57,6 +57,15 @@ class TestCards:
         assert CardKeyword.objects.count() == 2
         assert c.cardkeyword_set.count() == 2
         assert k1.cardkeyword_set.count() == 1
+        c2 = Card.objects.create_card(name='Head Jab', text='', _class=Card.Class.NINJA, _type=Card.Type.ACTION, pitch=Card.Pitch.RED)
+        c2.save()
+        ck3 = CardKeyword.objects.create(card=c2, keyword=k1)
+        ck3.save()
+        assert c2.cardkeyword_set.count() == 1
+        assert k1.cardkeyword_set.count() == 2
+        assert Keyword.objects.count() == 2
+        assert Card.objects.count() == 2
+        assert CardKeyword.objects.count() == 3
 
 class UsersManagersTests(TestCase):
     def test_create_user(self):
