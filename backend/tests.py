@@ -22,20 +22,20 @@ class TestSets:
 @pytest.mark.django_db
 class TestCards:
     def test_card_create(self):
-        s = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ATTACK_ACTION, pitch=1)
+        s = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
         s.save()
         assert Card.objects.count() == 1
         assert s.is_banned == False
     
     def test_card_unique(self):
-        s1 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ATTACK_ACTION, pitch=1)
+        s1 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
         s1.save()
         with pytest.raises(IntegrityError, match=".* violates unique constraint .*"):
-            s2 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ATTACK_ACTION, pitch=1)
+            s2 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
             s2.save()
 
     def test_banned_card_create(self):
-        s = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ATTACK_ACTION, pitch=1, is_banned=True)
+        s = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1, is_banned=True)
         s.save()
         assert s.is_banned == True
 
