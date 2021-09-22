@@ -3,6 +3,8 @@ import pandas as pd
 import urllib.request
 import os
 
+from backend.models import Keyword
+
 class Command(BaseCommand):
     help = 'Download the .xlsx file with all cards and printings data and updates the database accordingly'
 
@@ -17,7 +19,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
         printingsFile = os.path.join('xls/', 'printings.xls')
-        print(options)
 
         if options['nodownload']:
             if not os.path.exists('xls/'):
@@ -35,5 +36,14 @@ class Command(BaseCommand):
             urllib.request.urlretrieve(printingsUrl, printingsFile)
 
         df = pd.read_excel(cardsFile, sheet_name='keywords')
+        df = df.fillna('')
 
-        print(df)
+        keyword_dict = df.to_dict(orient='records')
+        for keyword in keyword_dict:
+            try:
+                Keyword.objects.create(name=keyword['Name'], description=keyword['Description'], notes=keyword['Notes'])
+            except:
+                existingKeyword = Keyword.objects.get(name=keyword['Name'])
+                existingKeyword.description = keyword['Description']
+                existingKeyword.notes = keyword['Notes']
+                existingKeyword.save()

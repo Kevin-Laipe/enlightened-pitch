@@ -16,8 +16,9 @@ class Set(models.Model):
 
 class Keyword(models.Model):
     ''' Go again, Dominate, Blade Break... '''
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
     description = models.CharField(max_length=500)
+    notes = models.CharField(max_length=5000)
 
     def __str__(self):
         return self.name
