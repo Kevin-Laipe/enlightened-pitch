@@ -13,6 +13,8 @@ pytest-django = "*"
 coveralls = "*"
 pillow = "*"
 coverage = "*"
+pandas = "*"
+xlrd = "*"
 
 [dev-packages]
 

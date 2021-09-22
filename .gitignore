@@ -313,3 +313,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Downloaded xls files
+/xls
