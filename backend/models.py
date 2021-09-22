@@ -1,3 +1,4 @@
+from attr import s
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
@@ -17,6 +18,9 @@ class Keyword(models.Model):
     ''' Go again, Dominate, Blade Break... '''
     name = models.CharField(max_length=20)
     description = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.name
 
 class Subtype(models.Model):
     ''' (1H), Chest, Aura... '''
@@ -116,44 +120,50 @@ class Card(models.Model):
             models.UniqueConstraint(fields=['name', 'pitch'], name='unique card')
         ]
 
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.pitch)
+
 class CardKeyword(models.Model):
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
-    keyword_id = models.ForeignKey('Keyword', on_delete=models.CASCADE)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
+    keyword = models.ForeignKey('Keyword', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "%s - %s" % (self.card, self.keyword)
 
 class CardSubtype(models.Model):
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
-    subtype_id = models.ForeignKey('Subtype', on_delete=models.CASCADE)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
+    subtype = models.ForeignKey('Subtype', on_delete=models.CASCADE)
 
 class CardTalent(models.Model):
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
-    talent_id = models.ForeignKey('Talent', on_delete=models.CASCADE)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
+    talent = models.ForeignKey('Talent', on_delete=models.CASCADE)
 
 class CardReleasenote(models.Model):
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
-    releasenote_id = models.ForeignKey('Releasenote', on_delete=models.CASCADE)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
+    releasenote = models.ForeignKey('Releasenote', on_delete=models.CASCADE)
 
 class CardStat(models.Model):
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
-    stat_id = models.ForeignKey('Stat', on_delete=models.CASCADE)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
+    stat = models.ForeignKey('Stat', on_delete=models.CASCADE)
     value = models.SmallIntegerField()
 
 class CardSupertype(models.Model):
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
-    supertype_id = models.ForeignKey('Supertype', on_delete=models.CASCADE)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
+    supertype = models.ForeignKey('Supertype', on_delete=models.CASCADE)
 
 class Deck(models.Model):
     creator = models.ForeignKey('User', on_delete=models.CASCADE)
     description = models.TextField(max_length=5000)
 
 class DeckCard(models.Model):
-    deck_id = models.ForeignKey('Deck', on_delete=models.CASCADE)
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE)
+    deck = models.ForeignKey('Deck', on_delete=models.CASCADE)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
     amount = models.PositiveSmallIntegerField()
     in_sideboard = models.PositiveSmallIntegerField()
 
 class Copy(models.Model):
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE)
-    printing_id = models.ForeignKey('Printing', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    printing = models.ForeignKey('Printing', on_delete=models.CASCADE)
     amount_owned = models.PositiveSmallIntegerField()
     amount_wanted = models.PositiveSmallIntegerField()
     amount_trading = models.PositiveSmallIntegerField()

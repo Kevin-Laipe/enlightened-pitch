@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.db.utils import DataError, IntegrityError
 from django.contrib.auth import get_user_model
 
-from .models import Set, Card
+from .models import Keyword, Set, Card, CardKeyword
 
 @pytest.mark.django_db
 class TestSets:
@@ -22,22 +22,41 @@ class TestSets:
 @pytest.mark.django_db
 class TestCards:
     def test_card_create(self):
-        s = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
-        s.save()
+        c = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
+        c.save()
         assert Card.objects.count() == 1
-        assert s.is_banned == False
+        assert c.is_banned == False
     
     def test_card_unique(self):
-        s1 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
-        s1.save()
-        with pytest.raises(IntegrityError, match=".* violates unique constraint .*"):
-            s2 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
-            s2.save()
+        c1 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
+        c1.save()
+        with pytest.raises(IntegrityError, match='.* violates unique constraint .*'):
+            c2 = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1)
+            c2.save()
 
     def test_banned_card_create(self):
-        s = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1, is_banned=True)
-        s.save()
-        assert s.is_banned == True
+        c = Card.objects.create_card(name='Snatch', text='If Snatch hits, draw a card', _class=Card.Class.GENERIC, _type=Card.Type.ACTION, pitch=1, is_banned=True)
+        c.save()
+        assert c.is_banned == True
+
+    def test_keyworded_cards_create(self):
+        k1 = Keyword.objects.create(name='Go again', description='Gain an action point when the card resolves.')
+        k1.save()
+        c = Card.objects.create_card(name='Open the Center', text='', _class=Card.Class.NINJA, _type=Card.Type.ACTION, pitch=1)
+        c.save()
+        ck1 = CardKeyword.objects.create(card=c, keyword=k1)
+        ck1.save()
+        assert ck1.card == c
+        assert ck1.keyword == k1
+        k2 = Keyword.objects.create(name='Dominate', description='The defending player cannot defend with more than one card from hand.')
+        k2.save()
+        ck2 = CardKeyword.objects.create(card=c, keyword=k2)
+        ck2.save()
+        assert Keyword.objects.count() == 2
+        assert Card.objects.count() == 1
+        assert CardKeyword.objects.count() == 2
+        assert c.cardkeyword_set.count() == 2
+        assert k1.cardkeyword_set.count() == 1
 
 class UsersManagersTests(TestCase):
     def test_create_user(self):
