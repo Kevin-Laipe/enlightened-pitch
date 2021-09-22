@@ -6,7 +6,7 @@ import os
 from backend.models import Keyword
 
 class Command(BaseCommand):
-    help = 'Download the .xlsx file with all cards and printings data and updates the database accordingly'
+    help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
 
     def add_arguments(self, parser):
         parser.add_argument(

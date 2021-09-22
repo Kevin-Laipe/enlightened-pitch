@@ -23,10 +23,16 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email',)
     ordering = ('email',)
 
+class KeywordAdmin(admin.ModelAdmin):
+    model = Keyword
+    list_display = ('name', 'description', )
+    search_fields = ('name', )
+    ordering = ('name', )
+
 admin.site.register(Card)
 admin.site.register(Printing)
 admin.site.register(Set)
-admin.site.register(Keyword)
+admin.site.register(Keyword, KeywordAdmin)
 admin.site.register(Subtype)
 admin.site.register(Talent)
 admin.site.register(Releasenote)
