@@ -59,6 +59,12 @@ class BlocAdmin(admin.ModelAdmin):
     search_fields = ('name', )
     ordering = ('name', )
 
+class StatAdmin(admin.ModelAdmin):
+    model = Bloc
+    list_display = ('name', 'id',)
+    search_fields = ('name', )
+    ordering = ('name', )
+
 admin.site.register(Card)
 admin.site.register(Class, ClassAdmin)
 admin.site.register(Printing)
@@ -69,7 +75,7 @@ admin.site.register(Supertype, SupertypeAdmin)
 admin.site.register(Talent, TalentAdmin)
 admin.site.register(Bloc, BlocAdmin)
 admin.site.register(Releasenote)
-admin.site.register(Stat)
+admin.site.register(Stat, StatAdmin)
 admin.site.register(CardKeyword)
 admin.site.register(CardSubtype)
 admin.site.register(CardTalent)

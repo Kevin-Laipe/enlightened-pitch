@@ -27,9 +27,15 @@ class Subtype(models.Model):
     ''' (1H), Chest, Aura... '''
     name = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.name
+
 class Talent(models.Model):
     ''' Shadow, Light, Elemental... '''
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
 class Releasenote(models.Model):
     ''' Rullings released by LSS upon a card's release '''
@@ -38,14 +44,23 @@ class Releasenote(models.Model):
 class Stat(models.Model):
     '''Cost, defense, attack '''
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
 class Supertype(models.Model):
     ''' Ice, Earth, Lightning... '''
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
 class Class(models.Model):
     ''' Generic, Brute, Runeblade... '''
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name_plural = "classes"
@@ -53,11 +68,17 @@ class Class(models.Model):
 class Type(models.Model):
     ''' Action, instant, defense reaction... '''
     name = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.name
 
 class Bloc(models.Model):
     ''' Play sets (as opposed to master sets)... '''
     name = models.CharField(max_length=30)
     description = models.CharField(max_length=500)
+    
+    def __str__(self):
+        return self.name
 
 class Printing(models.Model):
     '''  '''
@@ -94,28 +115,22 @@ class Printing(models.Model):
     )
 
 class Card(models.Model):
-    class Pitch(models.IntegerChoices):
-        NONE = 0
-        RED = 1
-        YELLOW = 2
-        BLUE = 3
-
     name = models.CharField(max_length=50)
     text = models.CharField(max_length=500)
     _class = models.ForeignKey('Class', on_delete=models.CASCADE)
     _type = models.ForeignKey('Type', on_delete=models.CASCADE)
-    pitch = models.IntegerField(choices=Pitch.choices, default=0)
     bloc = models.CharField(max_length=30)
     is_banned_cc = models.BooleanField(default=False)
     is_banned_blitz = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name', 'pitch'], name='unique card')
+            models.UniqueConstraint(fields=['name'], name='unique card')
         ]
 
     def __str__(self):
-        return "%s (%s)" % (self.name, self.pitch)
+        # TODO: if the card has different pitch versions, add its color to its name
+        return "%s" % (self.name)
 
 class CardKeyword(models.Model):
     card = models.ForeignKey('Card', on_delete=models.CASCADE)

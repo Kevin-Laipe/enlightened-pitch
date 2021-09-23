@@ -3,7 +3,7 @@ import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Bloc, Class, Keyword, Subtype, Supertype, Talent, Type
+from backend.models import Bloc, Class, Keyword, Stat, Subtype, Supertype, Talent, Type
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -132,6 +132,20 @@ class Command(BaseCommand):
                 existingBloc.description = bloc['Description']
                 existingBloc.save()
 
+    def addStatsToDatabase(self, fileName, sheetName):
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        stats = df.to_dict(orient='records')
+        for stat in stats:
+            try:
+                s = Stat.objects.create(id=stat['ID'], name=stat['Name'])
+                s.save()
+            except:
+                existingStat = Stat.objects.get(id=stat['ID'])
+                existingStat.name = stat['Name']
+                existingStat.save()
+
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
         printingsFile = os.path.join('xls/', 'printings.xls')
@@ -146,3 +160,4 @@ class Command(BaseCommand):
         self.addSubtypesToDatabase(cardsFile, 'subtypes')
         self.addKeywordsToDatabase(cardsFile, 'keywords')
         self.addBlocsToDatabase(cardsFile, 'blocs')
+        self.addStatsToDatabase(cardsFile, 'stats')
