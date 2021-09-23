@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from .managers import UserManager, CardManager
+from .managers import UserManager
 
 def image_directory_path(instance, filename):
     return 'images/{0}'.format(filename)
@@ -111,10 +111,10 @@ class Card(models.Model):
     text = models.CharField(max_length=500)
     _class = models.IntegerField(choices=Class.choices)
     _type = models.IntegerField(choices=Type.choices)
-    pitch = models.IntegerField(choices=Pitch.choices)
-    is_banned = models.BooleanField(default=False)
-
-    objects = CardManager()
+    pitch = models.IntegerField(choices=Pitch.choices, default=0)
+    bloc = models.CharField(max_length=30)
+    is_banned_cc = models.BooleanField(default=False)
+    is_banned_blitz = models.BooleanField(default=False)
 
     class Meta:
         constraints = [

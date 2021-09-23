@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import Card, Printing, Set, Keyword, Subtype, Talent, Releasenote, Stat, CardKeyword, CardSubtype, CardTalent, CardReleasenote, CardStat, User, Copy, Deck, DeckCard
+from .models import Card, Printing, Set, Keyword, Subtype, Supertype, Talent, Releasenote, Stat, CardKeyword, CardSubtype, CardTalent, CardReleasenote, CardStat, User, Copy, Deck, DeckCard
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
@@ -40,6 +40,7 @@ admin.site.register(Printing)
 admin.site.register(Set)
 admin.site.register(Keyword, KeywordAdmin)
 admin.site.register(Subtype, SubtypeAdmin)
+admin.site.register(Supertype)
 admin.site.register(Talent)
 admin.site.register(Releasenote)
 admin.site.register(Stat)
