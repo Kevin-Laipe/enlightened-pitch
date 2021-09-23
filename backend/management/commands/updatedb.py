@@ -3,7 +3,7 @@ import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Keyword
+from backend.models import Keyword, Subtype
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -35,15 +35,30 @@ class Command(BaseCommand):
             urllib.request.urlretrieve(cardsUrl, cardsFile)
             urllib.request.urlretrieve(printingsUrl, printingsFile)
 
+        # KEYWORDS
         df = pd.read_excel(cardsFile, sheet_name='keywords')
         df = df.fillna('')
 
         keyword_dict = df.to_dict(orient='records')
         for keyword in keyword_dict:
             try:
-                Keyword.objects.create(name=keyword['Name'], description=keyword['Description'], notes=keyword['Notes'])
+                Keyword.objects.create(id=keyword['ID'], name=keyword['Name'], description=keyword['Description'], notes=keyword['Notes'])
             except:
-                existingKeyword = Keyword.objects.get(name=keyword['Name'])
+                existingKeyword = Keyword.objects.get(id=keyword['ID'])
+                existingKeyword.name = keyword['Name']
                 existingKeyword.description = keyword['Description']
                 existingKeyword.notes = keyword['Notes']
                 existingKeyword.save()
+
+        # SUBTYPES
+        df = pd.read_excel(cardsFile, sheet_name='subtypes')
+        df = df.fillna('')
+
+        subtype_dict = df.to_dict(orient='records')
+        for subtype in subtype_dict:
+            try:
+                Subtype.objects.create(id=subtype['ID'], name=subtype['Name'])
+            except:
+                existingSubtype = Subtype.objects.get(id=subtype['ID'])
+                existingSubtype.name = subtype['Name']
+                existingSubtype.save()

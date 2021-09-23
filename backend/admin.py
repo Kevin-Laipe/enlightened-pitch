@@ -25,7 +25,13 @@ class CustomUserAdmin(UserAdmin):
 
 class KeywordAdmin(admin.ModelAdmin):
     model = Keyword
-    list_display = ('name', 'description', )
+    list_display = ('name', 'description', 'id', )
+    search_fields = ('name', )
+    ordering = ('name', )
+
+class SubtypeAdmin(admin.ModelAdmin):
+    model = Subtype
+    list_display = ('name', 'id',)
     search_fields = ('name', )
     ordering = ('name', )
 
@@ -33,7 +39,7 @@ admin.site.register(Card)
 admin.site.register(Printing)
 admin.site.register(Set)
 admin.site.register(Keyword, KeywordAdmin)
-admin.site.register(Subtype)
+admin.site.register(Subtype, SubtypeAdmin)
 admin.site.register(Talent)
 admin.site.register(Releasenote)
 admin.site.register(Stat)
