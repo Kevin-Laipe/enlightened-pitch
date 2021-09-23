@@ -43,6 +43,22 @@ class Supertype(models.Model):
     ''' Ice, Earth, Lightning... '''
     name = models.CharField(max_length=20)
 
+class Class(models.Model):
+    ''' Generic, Brute, Runeblade... '''
+    name = models.CharField(max_length=20)
+
+    class Meta:
+        verbose_name_plural = "classes"
+
+class Type(models.Model):
+    ''' Action, instant, defense reaction... '''
+    name = models.CharField(max_length=20)
+
+class Bloc(models.Model):
+    ''' Play sets (as opposed to master sets)... '''
+    name = models.CharField(max_length=30)
+    description = models.CharField(max_length=500)
+
 class Printing(models.Model):
     '''  '''
     class Finish(models.TextChoices):
@@ -78,29 +94,6 @@ class Printing(models.Model):
     )
 
 class Card(models.Model):
-    class Class(models.IntegerChoices):
-        GENERIC = 0
-        BRUTE = 1
-        GUARDIAN = 2
-        NINJA = 3
-        WARRIOR = 4
-        MECHANOLOGIST = 5
-        RANGER = 6
-        RUNEBLADE = 7
-        WIZARD = 8
-        MERCHANT = 9
-        SHAPESHIFTER = 10
-        ILLUSIONIST = 11
-
-    class Type(models.IntegerChoices):
-        ACTION = 0
-        ATTACK_REACTION = 1
-        DEFENSE_REACTION = 2
-        INSTANT = 3
-        EQUIPMENT = 4
-        WEAPON = 5
-        HERO = 6
-
     class Pitch(models.IntegerChoices):
         NONE = 0
         RED = 1
@@ -109,8 +102,8 @@ class Card(models.Model):
 
     name = models.CharField(max_length=50)
     text = models.CharField(max_length=500)
-    _class = models.IntegerField(choices=Class.choices)
-    _type = models.IntegerField(choices=Type.choices)
+    _class = models.ForeignKey('Class', on_delete=models.CASCADE)
+    _type = models.ForeignKey('Type', on_delete=models.CASCADE)
     pitch = models.IntegerField(choices=Pitch.choices, default=0)
     bloc = models.CharField(max_length=30)
     is_banned_cc = models.BooleanField(default=False)
@@ -168,6 +161,9 @@ class Copy(models.Model):
     amount_owned = models.PositiveSmallIntegerField()
     amount_wanted = models.PositiveSmallIntegerField()
     amount_trading = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name_plural = "copies"
 
 class User(AbstractUser):
     username = None
