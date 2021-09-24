@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
 import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Bloc, Class, Keyword, Stat, Subtype, Supertype, Talent, Type
+from backend.models import Bloc, Card, CardKeyword, CardStat, CardSubtype, CardSupertype, Class, Keyword, Stat, Subtype, Supertype, Talent, Type
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -146,6 +147,106 @@ class Command(BaseCommand):
                 existingStat.name = stat['Name']
                 existingStat.save()
 
+    def addCardsToDatabase(self, fileName, sheetName):
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        cards = df.to_dict(orient='records')
+        for card in cards:
+            try:
+                c = Card.objects.create(
+                    id=card['ID'],
+                    name=card['Name'],
+                    talent=Talent.objects.get(name=card['Talent']) if card['Talent'] else None,
+                    _class=Class.objects.get(name=card['Class']) if card['Class'] else None,
+                    _type=Type.objects.get(name=card['Type']),
+                    text=card['Effect'],
+                    bloc=Bloc.objects.get(name=card['Bloc']),
+                    is_banned_cc=True if card['Banned CC'] == 'TRUE' else False,
+                    is_banned_blitz=True if card['Banned Blitz'] == 'TRUE' else False
+                )
+                c.save()
+            except:
+                existingCard = Card.objects.get(id=card['ID'])
+                existingCard.name = card['Name']
+                existingCard.talent = Talent.objects.get(name=card['Talent']) if card['Talent'] else None
+                existingCard._class = Class.objects.get(name=card['Class']) if card['Class'] else None
+                existingCard._type = Type.objects.get(name=card['Type'])
+                existingCard.text = card['Effect']
+                existingCard.bloc = Bloc.objects.get(name=card['Bloc'])
+                existingCard.is_banned_cc=True if card['Banned CC'] == 'TRUE' else False
+                existingCard.is_banned_blitz=True if card['Banned Blitz'] == 'TRUE' else False
+                existingCard.save()
+
+            for supertype in card['Super-Types'].split():
+                if supertype != '':
+                    try:
+                        CardSupertype.objects.create(card=Card.objects.get(id=card['ID']), supertype=Supertype.objects.get(name=supertype))
+                    except IntegrityError:
+                        pass
+
+            for subtype in card['Sub-Types'].split():
+                if subtype != '':
+                    try:
+                        CardSubtype.objects.create(card=Card.objects.get(id=card['ID']), subtype=Subtype.objects.get(name=subtype))
+                    except IntegrityError:
+                        pass
+
+            for keyword in card['Keywords'].split('\n'):
+                if keyword != '':
+                    try:
+                        CardKeyword.objects.create(card=Card.objects.get(id=card['ID']), keyword=Keyword.objects.get(name=keyword))
+                    except IntegrityError:
+                        pass
+
+            if card['Cost'] != '':
+                try:
+                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Cost'), value=card['Cost'])
+                except IntegrityError:
+                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Cost'))
+                    cs.value = card['Cost']
+                    cs.save()
+
+            if card['Pitch'] != '':
+                try:
+                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Pitch'), value=card['Pitch'])
+                except IntegrityError:
+                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Pitch'))
+                    cs.value = card['Pitch']
+                    cs.save()
+
+            if card['Power'] != '':
+                try:
+                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Power'), value=card['Power'])
+                except IntegrityError:
+                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Power'))
+                    cs.value = card['Power']
+                    cs.save()
+
+            if card['Defense'] != '':
+                try:
+                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Defense'), value=card['Defense'])
+                except IntegrityError:
+                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Defense'))
+                    cs.value = card['Defense']
+                    cs.save()
+
+            if card['Intellect'] != '':
+                try:
+                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Intellect'), value=card['Intellect'])
+                except IntegrityError:
+                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Intellect'))
+                    cs.value = card['Intellect']
+                    cs.save()
+
+            if card['Life'] != '':
+                try:
+                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Life'), value=card['Life'])
+                except IntegrityError:
+                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Life'))
+                    cs.value = card['Life']
+                    cs.save()
+
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
         printingsFile = os.path.join('xls/', 'printings.xls')
@@ -161,3 +262,4 @@ class Command(BaseCommand):
         self.addKeywordsToDatabase(cardsFile, 'keywords')
         self.addBlocsToDatabase(cardsFile, 'blocs')
         self.addStatsToDatabase(cardsFile, 'stats')
+        self.addCardsToDatabase(cardsFile, 'cards')

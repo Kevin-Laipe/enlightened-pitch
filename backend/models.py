@@ -116,10 +116,11 @@ class Printing(models.Model):
 
 class Card(models.Model):
     name = models.CharField(max_length=50)
-    text = models.CharField(max_length=500)
-    _class = models.ForeignKey('Class', on_delete=models.CASCADE)
+    text = models.TextField(max_length=1000)
+    _class = models.ForeignKey('Class', on_delete=models.CASCADE, blank=True, null=True)
     _type = models.ForeignKey('Type', on_delete=models.CASCADE)
-    bloc = models.CharField(max_length=30)
+    talent = models.ForeignKey('Talent', on_delete=models.CASCADE, blank=True, null=True)
+    bloc = models.ForeignKey('Bloc', on_delete=models.CASCADE)
     is_banned_cc = models.BooleanField(default=False)
     is_banned_blitz = models.BooleanField(default=False)
 
@@ -138,27 +139,48 @@ class CardKeyword(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.card, self.keyword)
+        
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['card', 'keyword'], name='A card cannot have the same keyword more than once')
+        ]
 
 class CardSubtype(models.Model):
     card = models.ForeignKey('Card', on_delete=models.CASCADE)
     subtype = models.ForeignKey('Subtype', on_delete=models.CASCADE)
-
-class CardTalent(models.Model):
-    card = models.ForeignKey('Card', on_delete=models.CASCADE)
-    talent = models.ForeignKey('Talent', on_delete=models.CASCADE)
+        
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['card', 'subtype'], name='A card cannot have the same subtype more than once')
+        ]
 
 class CardReleasenote(models.Model):
     card = models.ForeignKey('Card', on_delete=models.CASCADE)
     releasenote = models.ForeignKey('Releasenote', on_delete=models.CASCADE)
+        
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['card', 'releasenote'], name='A card cannot have the same release note more than once')
+        ]
 
 class CardStat(models.Model):
     card = models.ForeignKey('Card', on_delete=models.CASCADE)
     stat = models.ForeignKey('Stat', on_delete=models.CASCADE)
-    value = models.SmallIntegerField()
+    value = models.CharField(max_length=5)
+        
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['card', 'stat'], name='A card cannot have the same stat more than once')
+        ]
 
 class CardSupertype(models.Model):
     card = models.ForeignKey('Card', on_delete=models.CASCADE)
     supertype = models.ForeignKey('Supertype', on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['card', 'supertype'], name='A card cannot have the same super-type more than once')
+        ]
 
 class Deck(models.Model):
     creator = models.ForeignKey('User', on_delete=models.CASCADE)

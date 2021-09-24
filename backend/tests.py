@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.db.utils import DataError, IntegrityError
 from django.contrib.auth import get_user_model
 
-from .models import Class, Keyword, Set, Card, CardKeyword, Supertype, Subtype, Stat, Talent, Type
+from .models import Bloc, Class, Keyword, Set, Card, CardKeyword, Supertype, Subtype, Stat, Talent, Type
 
 @pytest.fixture
 def setup():
@@ -25,17 +25,19 @@ def setup():
     Supertype.objects.create(name='Lightning')
     Keyword.objects.create(name='Go again', description='Gain an action point when the card resolves.')
     Keyword.objects.create(name='Dominate', description='The defending player cannot defend with more than one card from hand.')
+    Bloc.objects.create(name='Welcome to Rathe', description='The og')
+    Bloc.objects.create(name='Arcane Rising', description='The magical one')
 
 @pytest.mark.django_db
 class TestSets:
     def test_set_create(self):
-        s = Set.objects.create(name="Welcome to Rathe", tag="WTR")
+        s = Set.objects.create(name='Welcome to Rathe', tag='WTR')
         s.save()
         assert Set.objects.count() == 1
 
     def test_set_tag_too_long(self):
-        with pytest.raises(DataError, match=".* too long .*"):
-            s = Set.objects.create(name="Iorem Set", tag="IOREMIPSUM")
+        with pytest.raises(DataError, match='.* too long .*'):
+            s = Set.objects.create(name='Iorem Set', tag='IOREMIPSUM')
 
     def test_set_empty_fields(self):
         pass # TODO: Use drf to ensure that empty fields won't exist in the db
@@ -48,7 +50,8 @@ class TestCards:
             name='Snatch',
             text='If Snatch hits, draw a card',
             _class=Class.objects.get(name='Generic'),
-            _type=Type.objects.get(name="Action")
+            _type=Type.objects.get(name='Action'),
+            bloc=Bloc.objects.get(name='Welcome to Rathe')
         )
         c.save()
         assert Card.objects.count() == 1
@@ -60,7 +63,8 @@ class TestCards:
             name='Snatch',
             text='If Snatch hits, draw a card',
             _class=Class.objects.get(name='Generic'),
-            _type=Type.objects.get(name="Action")
+            _type=Type.objects.get(name='Action'),
+            bloc=Bloc.objects.get(name='Welcome to Rathe')
         )
         c1.save()
         with pytest.raises(IntegrityError, match='.* violates unique constraint .*'):
@@ -68,7 +72,8 @@ class TestCards:
                 name='Snatch',
                 text='If Snatch hits, draw a card',
                 _class=Class.objects.get(name='Generic'),
-                _type=Type.objects.get(name="Action")
+                _type=Type.objects.get(name='Action'),
+                bloc=Bloc.objects.get(name='Welcome to Rathe')
             )
             c2.save()
 
@@ -77,7 +82,8 @@ class TestCards:
             name='Snatch',
             text='If Snatch hits, draw a card',
             _class=Class.objects.get(name='Generic'),
-            _type=Type.objects.get(name="Action"),
+            _type=Type.objects.get(name='Action'),
+            bloc=Bloc.objects.get(name='Welcome to Rathe'),
             is_banned_cc=True,
             is_banned_blitz=True
         )
@@ -90,9 +96,11 @@ class TestCards:
             name='Snatch',
             text='If Snatch hits, draw a card',
             _class=Class.objects.get(name='Generic'),
-            _type=Type.objects.get(name="Action"),
+            _type=Type.objects.get(name='Action'),
+            bloc=Bloc.objects.get(name='Welcome to Rathe')
         )
         c.save()
+        assert c.talent==None
         ck1 = CardKeyword.objects.create(card=c, keyword=Keyword.objects.get(name='Go again'))
         ck1.save()
         assert ck1.card == c
@@ -107,7 +115,9 @@ class TestCards:
             name='Head Jab',
             text='',
             _class=Class.objects.get(name='Ninja'),
-            _type=Type.objects.get(name="Action"),
+            _type=Type.objects.get(name='Action'),
+            bloc=Bloc.objects.get(name='Welcome to Rathe'),
+            talent=None
         )
         c2.save()
         ck3 = CardKeyword.objects.create(card=c2, keyword=Keyword.objects.get(name='Go again'))
@@ -118,6 +128,18 @@ class TestCards:
         assert Keyword.objects.count() == 2
         assert Card.objects.count() == 2
         assert CardKeyword.objects.count() == 3
+
+    def test_talent_card_create(self):
+        c = Card.objects.create(
+            name='Snatch',
+            text='If Snatch hits, draw a card',
+            _class=Class.objects.get(name='Generic'),
+            _type=Type.objects.get(name='Action'),
+            bloc=Bloc.objects.get(name='Welcome to Rathe'),
+            talent=Talent.objects.get(name='Light')
+        )
+        c.save()
+        assert c.talent == Talent.objects.get(name='Light')
 
 class UsersManagersTests(TestCase):
     def test_create_user(self):
