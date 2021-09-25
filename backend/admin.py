@@ -87,6 +87,10 @@ class CardKeywordInline(admin.TabularInline):
     model = CardKeyword
     extra = 0
 
+class CardReleasenoteInline(admin.TabularInline):
+    model = CardReleasenote
+    extra = 0
+
 class CardAdmin(admin.ModelAdmin):
     model = Bloc
     list_display = ('name', '_type', 'id',)
@@ -94,10 +98,7 @@ class CardAdmin(admin.ModelAdmin):
     ordering = ('id', )
     fieldsets = (
         (None, {
-            'fields': ('name', 'text', ('_class', 'talent', '_type'), )
-        }),
-        ('Restrictions', {
-            'fields': ('is_banned_cc', 'is_banned_blitz', )
+            'fields': ('name', 'text', ('_class', 'talent', '_type'), ('is_banned_cc', 'is_banned_blitz'), )
         }),
         ('Bloc', {
             'fields': ('bloc', )
@@ -108,7 +109,14 @@ class CardAdmin(admin.ModelAdmin):
         CardKeywordInline,
         CardSupertypeInline,
         CardSubtypeInline,
+        CardReleasenoteInline,
     ]
+
+class CardReleasenoteAdmin(admin.ModelAdmin):
+    model = CardReleasenote
+    list_display = ('card', 'id',)
+    search_fields = ('card', )
+    ordering = ('card', )
 
 admin.site.register(Card, CardAdmin)
 admin.site.register(Class, ClassAdmin)
@@ -123,7 +131,7 @@ admin.site.register(Releasenote)
 admin.site.register(Stat, StatAdmin)
 admin.site.register(CardKeyword)
 admin.site.register(CardSubtype)
-admin.site.register(CardReleasenote)
+admin.site.register(CardReleasenote, CardReleasenoteAdmin)
 admin.site.register(CardStat)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Copy)

@@ -4,7 +4,7 @@ import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Bloc, Card, CardKeyword, CardStat, CardSubtype, CardSupertype, Class, Keyword, Stat, Subtype, Supertype, Talent, Type
+from backend.models import Bloc, Card, CardKeyword, CardReleasenote, CardStat, CardSubtype, CardSupertype, Class, Keyword, Releasenote, Stat, Subtype, Supertype, Talent, Type
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -247,6 +247,28 @@ class Command(BaseCommand):
                     cs.value = card['Life']
                     cs.save()
 
+    def addReleaseNotesToDatabase(self, fileName, sheetName):
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        releaseNotes = df.to_dict(orient='records')
+        for releaseNote in releaseNotes:
+            try:
+                r = Releasenote.objects.create(id=releaseNote['ID'], text=releaseNote['Text'])
+                r.save()
+            except:
+                existingReleasenote = Releasenote.objects.get(id=releaseNote['ID'])
+                existingReleasenote.text = releaseNote['Text']
+                existingReleasenote.save()
+
+            try:
+                cardsQueryset = Card.objects.filter(name__regex=releaseNote['Name'])
+                for card in cardsQueryset:
+                    cr = CardReleasenote.objects.create(card=card, releasenote=Releasenote.objects.get(id=releaseNote['ID']))
+                    cr.save()
+            except:
+                pass
+
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
         printingsFile = os.path.join('xls/', 'printings.xls')
@@ -263,3 +285,4 @@ class Command(BaseCommand):
         self.addBlocsToDatabase(cardsFile, 'blocs')
         self.addStatsToDatabase(cardsFile, 'stats')
         self.addCardsToDatabase(cardsFile, 'cards')
+        self.addReleaseNotesToDatabase(cardsFile, 'release_notes')

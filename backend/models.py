@@ -39,7 +39,7 @@ class Talent(models.Model):
 
 class Releasenote(models.Model):
     ''' Rullings released by LSS upon a card's release '''
-    text = models.CharField(max_length=500)
+    text = models.TextField(max_length=5000)
 
 class Stat(models.Model):
     '''Cost, defense, attack '''
@@ -158,6 +158,9 @@ class CardReleasenote(models.Model):
     card = models.ForeignKey('Card', on_delete=models.CASCADE)
     releasenote = models.ForeignKey('Releasenote', on_delete=models.CASCADE)
         
+    def __str__(self):
+        return str(self.card)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['card', 'releasenote'], name='A card cannot have the same release note more than once')
