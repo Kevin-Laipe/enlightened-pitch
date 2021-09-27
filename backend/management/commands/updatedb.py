@@ -33,6 +33,7 @@ class Command(BaseCommand):
         urllib.request.urlretrieve(printingsUrl, printingsFile)
 
     def addTalentsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add talents from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -46,7 +47,10 @@ class Command(BaseCommand):
                 existingTalent.name = talent['Name']
                 existingTalent.save()
 
+        self.stdout.write(self.style.SUCCESS("Talents added successfully !"))
+
     def addSupertypesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add supertypes from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -60,7 +64,10 @@ class Command(BaseCommand):
                 existingSupertype.name = supertype['Name']
                 existingSupertype.save()
 
+        self.stdout.write(self.style.SUCCESS("Supertypes added successfully !"))
+
     def addClassesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add classes from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -73,8 +80,11 @@ class Command(BaseCommand):
                 existingClass = Class.objects.get(id=_class['ID'])
                 existingClass.name = _class['Name']
                 existingClass.save()
+
+        self.stdout.write(self.style.SUCCESS("Classes added successfully !"))
     
     def addTypesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add types from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -88,7 +98,10 @@ class Command(BaseCommand):
                 existingType.name = _type['Name']
                 existingType.save()
 
+        self.stdout.write(self.style.SUCCESS("Types added successfully !"))
+
     def addSubtypesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add subtypes from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -102,7 +115,10 @@ class Command(BaseCommand):
                 existingSubtype.name = subtype['Name']
                 existingSubtype.save()
 
+        self.stdout.write(self.style.SUCCESS("Subtypes added successfully !"))
+
     def addKeywordsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add keywords from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -118,7 +134,10 @@ class Command(BaseCommand):
                 existingKeyword.notes = keyword['Notes']
                 existingKeyword.save()
 
+        self.stdout.write(self.style.SUCCESS("Keywords added successfully !"))
+
     def addBlocsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add blocs from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -133,7 +152,10 @@ class Command(BaseCommand):
                 existingBloc.description = bloc['Description']
                 existingBloc.save()
 
+        self.stdout.write(self.style.SUCCESS("Blocs added successfully !"))
+
     def addStatsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add stats from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -147,7 +169,10 @@ class Command(BaseCommand):
                 existingStat.name = stat['Name']
                 existingStat.save()
 
+        self.stdout.write(self.style.SUCCESS("Stats added successfully !"))
+
     def addCardsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add cards from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -166,6 +191,7 @@ class Command(BaseCommand):
                     is_banned_blitz=True if card['Banned Blitz'] == 'TRUE' else False
                 )
                 c.save()
+                self.stdout.write(self.style.SUCCESS("Card '%s' successfully created !" % c))
             except:
                 existingCard = Card.objects.get(id=card['ID'])
                 existingCard.name = card['Name']
@@ -177,6 +203,7 @@ class Command(BaseCommand):
                 existingCard.is_banned_cc=True if card['Banned CC'] == 'TRUE' else False
                 existingCard.is_banned_blitz=True if card['Banned Blitz'] == 'TRUE' else False
                 existingCard.save()
+                self.stdout.write(self.style.SUCCESS("Card '%s' successfully updated !" % existingCard))
 
             for supertype in card['Super-Types'].split():
                 if supertype != '':
@@ -247,7 +274,12 @@ class Command(BaseCommand):
                     cs.value = card['Life']
                     cs.save()
 
+            self.stdout.write(self.style.SUCCESS("Card '%s' successfully linked to its dependencies !" % card['Name']))
+        
+        self.stdout.write(self.style.SUCCESS("Cards added successfully !"))
+
     def addReleaseNotesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add release notes from .xls file...")
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
@@ -268,6 +300,8 @@ class Command(BaseCommand):
                     cr.save()
             except:
                 pass
+
+        self.stdout.write(self.style.SUCCESS("Release notes added successfully !"))
 
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
