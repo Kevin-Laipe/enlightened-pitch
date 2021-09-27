@@ -94,6 +94,7 @@ class CardReleasenoteInline(admin.TabularInline):
 class CardAdmin(admin.ModelAdmin):
     model = Card
     list_display = ('name', '_type', 'id',)
+    list_filter = ('bloc', '_class', '_type', 'talent')
     search_fields = ('name', )
     ordering = ('id', )
     fieldsets = (
@@ -115,7 +116,7 @@ class CardAdmin(admin.ModelAdmin):
 class PrintingAdmin(admin.ModelAdmin):
     model = Printing
     list_display = ('uid', 'card', 'rarity', 'finish', 'set', )
-    list_filter = ('rarity', 'finish', 'set')
+    list_filter = ('set', 'finish', 'rarity', )
     search_fields = ('card__name', 'uid', )
     ordering = ('uid', )
 

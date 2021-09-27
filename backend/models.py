@@ -116,7 +116,7 @@ class Printing(models.Model):
     flavour_text= models.TextField(max_length=250, blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.card.name
 
 class Card(models.Model):
     name = models.CharField(max_length=50)
