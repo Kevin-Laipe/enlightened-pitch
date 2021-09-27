@@ -11,8 +11,11 @@ def image_directory_path(instance, filename):
 
 class Set(models.Model):
     ''' Welcome to Rathe, Arcane Rising... '''
+    id = models.CharField(max_length=10, primary_key=True)
     name = models.CharField(max_length=50)
-    tag = models.CharField(max_length=5)
+
+    def __str__(self):
+        return self.name
 
 class Keyword(models.Model):
     ''' Go again, Dominate, Blade Break... '''
@@ -80,39 +83,40 @@ class Bloc(models.Model):
     def __str__(self):
         return self.name
 
+class Finish(models.Model):
+    '''  '''
+    name = models.CharField(max_length=30)
+    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "finishes"
+        
+class Rarity(models.Model):
+    '''  '''
+    name = models.CharField(max_length=30)
+    tag = models.CharField(max_length=1)
+    
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "rarities"
+
 class Printing(models.Model):
     '''  '''
-    class Finish(models.TextChoices):
-        REGULAR = '', _('Regular')
-        RAINBOW_FOIL = 'RF', _('Rainbow Foil')
-        COLD_FOIL = 'CF', _('Cold Foil')
-        EXTENDED_ART = 'EA', _('Extended Art')
-        ALTERNATE_ART = 'AA', _('Alternate Art')
-
-    class Rarity(models.TextChoices):
-        COMMON = 'C', _('Common')
-        RARE = 'R', _('Rare')
-        SUPER_RARE = 'S', _('Super Rare')
-        MAJESTIC = 'M', _('Majestic')
-        LEGENDARY = 'L', _('Legendary')
-        FABLED = 'F', _('Fabled')
-        PROMO = 'P', _('Promo')
-
-    sku = models.CharField(max_length=15, unique=True)
-    card_id = models.ForeignKey('Card', on_delete=models.CASCADE) #TODO
-    finish = models.CharField(
-        max_length=2,
-        choices=Finish.choices,
-        default=Finish.REGULAR,
-    )
+    uid = models.CharField(max_length=15, unique=True, primary_key=True)
+    card = models.ForeignKey('Card', on_delete=models.CASCADE)
+    finish = models.ForeignKey('Finish',on_delete=models.CASCADE)
     image = models.ImageField(upload_to=image_directory_path)
-    artist = models.CharField(max_length=30)
-    set_id = models.ForeignKey('Set', on_delete=models.CASCADE)
-    is_first_edition = models.BooleanField(null=True)
-    rarity = models.CharField(
-        max_length=1,
-        choices=Rarity.choices,
-    )
+    set = models.ForeignKey('Set', on_delete=models.CASCADE)
+    is_first_edition = models.BooleanField(blank=True, null=True)
+    rarity = models.ForeignKey('Rarity', on_delete=models.CASCADE)
+    flavour_text= models.TextField(max_length=250, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
 class Card(models.Model):
     name = models.CharField(max_length=50)

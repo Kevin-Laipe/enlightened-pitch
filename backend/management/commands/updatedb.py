@@ -4,7 +4,7 @@ import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Bloc, Card, CardKeyword, CardReleasenote, CardStat, CardSubtype, CardSupertype, Class, Keyword, Releasenote, Stat, Subtype, Supertype, Talent, Type
+from backend.models import Bloc, Card, CardKeyword, CardReleasenote, CardStat, CardSubtype, CardSupertype, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -273,8 +273,6 @@ class Command(BaseCommand):
                     cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Life'))
                     cs.value = card['Life']
                     cs.save()
-
-            self.stdout.write(self.style.SUCCESS("Card '%s' successfully linked to its dependencies !" % card['Name']))
         
         self.stdout.write(self.style.SUCCESS("Cards added successfully !"))
 
@@ -303,6 +301,90 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Release notes added successfully !"))
 
+    def addFinishesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add finishes from .xls file...")
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        finishes = df.to_dict(orient='records')
+        for finish in finishes:
+            try:
+                f = Finish.objects.create(id=finish['ID'], name=finish['Name'])
+                f.save()
+            except:
+                existingFinish = Finish.objects.get(id=finish['ID'])
+                existingFinish.name = finish['Name']
+                existingFinish.save()
+
+        self.stdout.write(self.style.SUCCESS("Finishes added successfully !"))
+
+    def addRaritiesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add rarities from .xls file...")
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        rarities = df.to_dict(orient='records')
+        for rarity in rarities:
+            try:
+                r = Rarity.objects.create(id=rarity['ID'], name=rarity['Name'], tag=rarity['Tag'])
+                r.save()
+            except:
+                existingRarity = Rarity.objects.get(id=rarity['ID'])
+                existingRarity.name = rarity['Name']
+                existingRarity.tag = rarity['Tag']
+                existingRarity.save()
+
+        self.stdout.write(self.style.SUCCESS("Rarities added successfully !"))
+
+    def addSetsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add sets from .xls file...")
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        sets = df.to_dict(orient='records')
+        for set in sets:
+            try:
+                s = Set.objects.create(id=set['ID'], name=set['Name'])
+                s.save()
+            except:
+                existingSet = Set.objects.get(id=set['ID'])
+                existingSet.name = set['Name']
+                existingSet.save()
+
+        self.stdout.write(self.style.SUCCESS("Sets added successfully !"))
+    
+    def addPrintingsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add printings from .xls file (sheet '%s')..." % sheetName)
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        printings = df.to_dict(orient='records')
+        for printing in printings:
+            try:
+                p = Printing.objects.create(
+                    uid=printing['uid'],
+                    image=printing['Image'],
+                    card=Card.objects.get(name=printing['Name']),
+                    finish=Finish.objects.get(name=printing['Finish']),
+                    flavour_text=printing['Flavour Text'],
+                    rarity=Rarity.objects.get(name= printing['Rarity']),
+                    set=Set.objects.get(id=printing['Set Tag']),
+                    is_first_edition=printing['First Edition']
+                )
+                p.save()
+            except:
+                existingPrinting = Printing.objects.get(uid=printing['uid'])
+                existingPrinting.image = printing['Image']
+                existingPrinting.card = Card.objects.get(name=printing['Name'])
+                existingPrinting.finish = Finish.objects.get(name=printing['Finish'])
+                existingPrinting.falvour_text = printing['Flavour Text']
+                existingPrinting.rarity = Rarity.objects.get(name=printing['Rarity'])
+                existingPrinting.set = Set.objects.get(id=printing['Set Tag'])
+                existingPrinting.is_first_edition = printing['First Edition']
+                existingPrinting.save()
+
+        self.stdout.write(self.style.SUCCESS("Printings from '%s' added successfully !" % sheetName))
+ 
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
         printingsFile = os.path.join('xls/', 'printings.xls')
@@ -310,13 +392,20 @@ class Command(BaseCommand):
         if options['nodownload']:
             self.nodownload(cardsFile, printingsFile)
 
-        self.addTalentsToDatabase(cardsFile, 'talents')
-        self.addSupertypesToDatabase(cardsFile, 'supertypes')
-        self.addClassesToDatabase(cardsFile, 'classes')
-        self.addTypesToDatabase(cardsFile, 'types')
-        self.addSubtypesToDatabase(cardsFile, 'subtypes')
-        self.addKeywordsToDatabase(cardsFile, 'keywords')
-        self.addBlocsToDatabase(cardsFile, 'blocs')
-        self.addStatsToDatabase(cardsFile, 'stats')
-        self.addCardsToDatabase(cardsFile, 'cards')
-        self.addReleaseNotesToDatabase(cardsFile, 'release_notes')
+        # self.addTalentsToDatabase(cardsFile, 'talents')
+        # self.addSupertypesToDatabase(cardsFile, 'supertypes')
+        # self.addClassesToDatabase(cardsFile, 'classes')
+        # self.addTypesToDatabase(cardsFile, 'types')
+        # self.addSubtypesToDatabase(cardsFile, 'subtypes')
+        # self.addKeywordsToDatabase(cardsFile, 'keywords')
+        # self.addBlocsToDatabase(cardsFile, 'blocs')
+        # self.addStatsToDatabase(cardsFile, 'stats')
+        # self.addCardsToDatabase(cardsFile, 'cards')
+        # self.addReleaseNotesToDatabase(cardsFile, 'release_notes')
+        # self.addFinishesToDatabase(cardsFile, 'finishes')
+        # self.addRaritiesToDatabase(cardsFile, 'rarities')
+        # self.addSetsToDatabase(cardsFile, 'sets')
+
+        xl = pd.ExcelFile(printingsFile)
+        for printing_sheet in xl.sheet_names:
+            self.addPrintingsToDatabase(printingsFile, printing_sheet)

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import Bloc, Card, CardSupertype, Class, Printing, Set, Keyword, Subtype, Supertype, Talent, Releasenote, Stat, CardKeyword, CardSubtype, CardReleasenote, CardStat, Type, User, Copy, Deck, DeckCard
+from .models import Bloc, Card, CardSupertype, Class, Finish, Printing, Rarity, Set, Keyword, Subtype, Supertype, Talent, Releasenote, Stat, CardKeyword, CardSubtype, CardReleasenote, CardStat, Type, User, Copy, Deck, DeckCard
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
@@ -92,7 +92,7 @@ class CardReleasenoteInline(admin.TabularInline):
     extra = 0
 
 class CardAdmin(admin.ModelAdmin):
-    model = Bloc
+    model = Card
     list_display = ('name', '_type', 'id',)
     search_fields = ('name', )
     ordering = ('id', )
@@ -112,15 +112,34 @@ class CardAdmin(admin.ModelAdmin):
         CardReleasenoteInline,
     ]
 
+class PrintingAdmin(admin.ModelAdmin):
+    model = Printing
+    list_display = ('uid', 'card', 'rarity', 'finish', 'set', )
+    list_filter = ('rarity', 'finish', 'set')
+    search_fields = ('card__name', 'uid', )
+    ordering = ('uid', )
+
 class CardReleasenoteAdmin(admin.ModelAdmin):
     model = CardReleasenote
     list_display = ('card', 'id',)
     search_fields = ('card', )
     ordering = ('card', )
 
+class RarityAdmin(admin.ModelAdmin):
+    model = Rarity
+    list_display = ('name', 'tag', 'id', )
+    search_fields = ('name', )
+    ordering = ('id', )
+
+class FinishAdmin(admin.ModelAdmin):
+    model = Finish
+    list_display = ('name', 'id', )
+    search_fields = ('name', )
+    ordering = ('name', )
+
 admin.site.register(Card, CardAdmin)
 admin.site.register(Class, ClassAdmin)
-admin.site.register(Printing)
+admin.site.register(Printing, PrintingAdmin)
 admin.site.register(Set)
 admin.site.register(Keyword, KeywordAdmin)
 admin.site.register(Subtype, SubtypeAdmin)
@@ -137,4 +156,6 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(Copy)
 admin.site.register(Deck)
 admin.site.register(DeckCard)
+admin.site.register(Finish, FinishAdmin)
+admin.site.register(Rarity, RarityAdmin)
 admin.site.register(Type, TypeAdmin)
