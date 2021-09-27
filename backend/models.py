@@ -124,7 +124,7 @@ class Card(models.Model):
     _class = models.ForeignKey('Class', on_delete=models.CASCADE, blank=True, null=True)
     _type = models.ForeignKey('Type', on_delete=models.CASCADE)
     talent = models.ForeignKey('Talent', on_delete=models.CASCADE, blank=True, null=True)
-    bloc = models.ForeignKey('Bloc', on_delete=models.CASCADE)
+    bloc = models.ForeignKey('Bloc', related_name='cards', on_delete=models.CASCADE)
     is_banned_cc = models.BooleanField(default=False)
     is_banned_blitz = models.BooleanField(default=False)
 
@@ -134,8 +134,7 @@ class Card(models.Model):
         ]
 
     def __str__(self):
-        # TODO: if the card has different pitch versions, add its color to its name
-        return "%s" % (self.name)
+        return self.name
 
 class CardKeyword(models.Model):
     card = models.ForeignKey('Card', on_delete=models.CASCADE)
@@ -190,7 +189,7 @@ class CardSupertype(models.Model):
         ]
 
 class Deck(models.Model):
-    creator = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
     description = models.TextField(max_length=5000)
 
 class DeckCard(models.Model):

@@ -31,13 +31,13 @@ def setup():
 @pytest.mark.django_db
 class TestSets:
     def test_set_create(self):
-        s = Set.objects.create(name='Welcome to Rathe', tag='WTR')
+        s = Set.objects.create(name='Welcome to Rathe', id='WTR')
         s.save()
         assert Set.objects.count() == 1
 
     def test_set_tag_too_long(self):
         with pytest.raises(DataError, match='.* too long .*'):
-            s = Set.objects.create(name='Iorem Set', tag='IOREMIPSUM')
+            s = Set.objects.create(name='Iorem Set', id='IOREMIPSUMAXIMUM')
 
     def test_set_empty_fields(self):
         pass # TODO: Use drf to ensure that empty fields won't exist in the db
