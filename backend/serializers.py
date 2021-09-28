@@ -1,7 +1,7 @@
 from re import T
 from rest_framework import serializers
 
-from backend.models import Bloc, Card, Class, Keyword, Releasenote, Subtype, Talent, Type
+from backend.models import Bloc, Card, CardStat, Class, Keyword, Releasenote, Stat, Subtype, Talent, Type
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
     keywords = serializers.HyperlinkedRelatedField(
@@ -9,9 +9,9 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         view_name='keyword-detail',
         read_only=True
     )
-    stats = serializers.HyperlinkedRelatedField(
+    cardstats = serializers.HyperlinkedRelatedField(
         many=True,
-        view_name='stat-detail',
+        view_name='cardstat-detail',
         read_only=True
     )
 
@@ -72,6 +72,16 @@ class KeywordSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Keyword
+        fields = '__all__'
+
+class StatSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Stat
+        fields = '__all__'
+
+class CardStatSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CardStat
         fields = '__all__'
 
 class ReleasenoteSerializer(serializers.HyperlinkedModelSerializer):

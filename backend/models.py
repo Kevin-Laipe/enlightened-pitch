@@ -123,6 +123,7 @@ class Printing(models.Model):
         return self.card.name
 
 class CardStat(models.Model):
+    card = models.ForeignKey('Card', related_name='cardstats', on_delete=models.CASCADE)
     stat = models.ForeignKey('Stat', on_delete=models.CASCADE)
     value = models.CharField(max_length=5)
 
@@ -133,7 +134,6 @@ class Card(models.Model):
     _type = models.ForeignKey('Type', related_name='cards', on_delete=models.CASCADE)
     keywords = models.ManyToManyField(Keyword, related_name='cards', blank=True)
     release_notes = models.ManyToManyField(Releasenote, related_name='cards', blank=True)
-    stats = models.ManyToManyField(CardStat, related_name='cards', blank=True)
     subtypes = models.ManyToManyField(Subtype, related_name='cards', blank=True)
     supertypes = models.ManyToManyField(Supertype, related_name='cards', blank=True)
     talent = models.ForeignKey('Talent', related_name='cards', on_delete=models.CASCADE, blank=True, null=True)

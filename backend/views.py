@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from .serializers import BlocSerializer, CardSerializer, ClassSerializer, KeywordSerializer, ReleasenoteSerializer, SubtypeSerializer, TalentSerializer, TypeSerializer
-from .models import Bloc, Card, Class, Keyword, Releasenote, Subtype, Talent, Type
+from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, KeywordSerializer, ReleasenoteSerializer, StatSerializer, SubtypeSerializer, TalentSerializer, TypeSerializer
+from .models import Bloc, Card, CardStat, Class, Keyword, Releasenote, Stat, Subtype, Talent, Type
 
 class CardViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -58,3 +58,17 @@ class SubtypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Subtype.objects.all()
     serializer_class = SubtypeSerializer
+
+class StatViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Stats.
+    """
+    queryset = Stat.objects.all()
+    serializer_class = StatSerializer
+
+class CardStatViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view CardStats.
+    """
+    queryset = CardStat.objects.all()
+    serializer_class = CardStatSerializer

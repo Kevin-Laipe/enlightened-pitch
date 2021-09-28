@@ -13,6 +13,8 @@ router.register(r'talents', views.TalentViewSet)
 router.register(r'keywords', views.KeywordViewSet)
 router.register(r'relesenotes', views.ReleasenoteViewSet)
 router.register(r'subtypes', views.SubtypeViewSet)
+router.register(r'stats', views.StatViewSet)
+router.register(r'cardstats', views.CardStatViewSet)
 
 urlpatterns = [
     path('', include(router.urls))

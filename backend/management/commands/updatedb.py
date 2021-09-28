@@ -238,49 +238,49 @@ class Command(BaseCommand):
             if cardStats.count() == 0:
                 if card['Cost'] != '':
                     try:
-                        CardStat.objects.create(stat=Stat.objects.get(name='Cost'), value=card['Cost'])
+                        CardStat.objects.create(card=c, stat=Stat.objects.get(name='Cost'), value=card['Cost'])
                     except IntegrityError:
-                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Cost'))
+                        cs = CardStat.objects.get(card=c, stat=Stat.objects.get(name='Cost'))
                         cs.value = card['Cost']
                         cs.save()
 
                 if card['Pitch'] != '':
                     try:
-                        CardStat.objects.create(stat=Stat.objects.get(name='Pitch'), value=card['Pitch'])
+                        CardStat.objects.create(card=c, stat=Stat.objects.get(name='Pitch'), value=card['Pitch'])
                     except IntegrityError:
-                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Pitch'))
+                        cs = CardStat.objects.get(card=c, stat=Stat.objects.get(name='Pitch'))
                         cs.value = card['Pitch']
                         cs.save()
 
                 if card['Power'] != '':
                     try:
-                        CardStat.objects.create(stat=Stat.objects.get(name='Power'), value=card['Power'])
+                        CardStat.objects.create(card=c, stat=Stat.objects.get(name='Power'), value=card['Power'])
                     except IntegrityError:
-                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Power'))
+                        cs = CardStat.objects.get(card=c, stat=Stat.objects.get(name='Power'))
                         cs.value = card['Power']
                         cs.save()
 
                 if card['Defense'] != '':
                     try:
-                        CardStat.objects.create(stat=Stat.objects.get(name='Defense'), value=card['Defense'])
+                        CardStat.objects.create(card=c, stat=Stat.objects.get(name='Defense'), value=card['Defense'])
                     except IntegrityError:
-                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Defense'))
+                        cs = CardStat.objects.get(card=c, stat=Stat.objects.get(name='Defense'))
                         cs.value = card['Defense']
                         cs.save()
 
                 if card['Intellect'] != '':
                     try:
-                        CardStat.objects.create(stat=Stat.objects.get(name='Intellect'), value=card['Intellect'])
+                        CardStat.objects.create(card=c, stat=Stat.objects.get(name='Intellect'), value=card['Intellect'])
                     except IntegrityError:
-                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Intellect'))
+                        cs = CardStat.objects.get(card=c, stat=Stat.objects.get(name='Intellect'))
                         cs.value = card['Intellect']
                         cs.save()
 
                 if card['Life'] != '':
                     try:
-                        CardStat.objects.create(stat=Stat.objects.get(name='Life'), value=card['Life'])
+                        CardStat.objects.create(card=c, stat=Stat.objects.get(name='Life'), value=card['Life'])
                     except IntegrityError:
-                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Life'))
+                        cs = CardStat.objects.get(card=c, stat=Stat.objects.get(name='Life'))
                         cs.value = card['Life']
                         cs.save()
             else:

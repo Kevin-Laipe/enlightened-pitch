@@ -82,7 +82,7 @@ class CardAdmin(admin.ModelAdmin):
             'fields': ('name', 'text', ('_class', 'talent', '_type'), ('is_banned_cc', 'is_banned_blitz'), )
         }),
         ('Stats', {
-            'fields': ('stats', 'keywords', 'subtypes', 'supertypes', )
+            'fields': ('keywords', 'subtypes', 'supertypes', )
         }),
         (None, {
             'fields': ('release_notes', )
@@ -99,18 +99,6 @@ class PrintingAdmin(admin.ModelAdmin):
     search_fields = ('card__name', 'uid', )
     ordering = ('uid', )
 
-# class ReleasenoteAdmin(admin.ModelAdmin):
-#     model = Releasenote
-#     list_display = ('card', 'id', )
-#     search_fields = ('card', )
-#     ordering = ('id', )
-
-# class CardReleasenoteAdmin(admin.ModelAdmin):
-#     model = CardReleasenote
-#     list_display = ('card', 'id',)
-#     search_fields = ('card', )
-#     ordering = ('card', )
-
 class RarityAdmin(admin.ModelAdmin):
     model = Rarity
     list_display = ('name', 'tag', 'id', )
@@ -125,9 +113,9 @@ class FinishAdmin(admin.ModelAdmin):
 
 class CardStatAdmin(admin.ModelAdmin):
     model = CardStat
-    list_display = ('cards', 'stat', 'value', )
-    search_fields = ('cards', )
-    ordering = ('cards', )
+    list_display = ('card', 'stat', 'value', )
+    search_fields = ('card', )
+    ordering = ('card', )
 
 admin.site.register(Card, CardAdmin)
 admin.site.register(Class, ClassAdmin)
@@ -140,7 +128,6 @@ admin.site.register(Talent, TalentAdmin)
 admin.site.register(Bloc, BlocAdmin)
 admin.site.register(Releasenote)
 admin.site.register(Stat, StatAdmin)
-# admin.site.register(CardReleasenote, CardReleasenoteAdmin)
 admin.site.register(CardStat, CardStatAdmin)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Copy)
