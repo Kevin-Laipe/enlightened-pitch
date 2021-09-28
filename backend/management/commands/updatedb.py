@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.db.utils import IntegrityError
+from django.db.utils import Error, IntegrityError
 import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Bloc, Card, CardKeyword, CardReleasenote, CardStat, CardSubtype, CardSupertype, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
+from backend.models import Bloc, Card, CardStat, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -191,6 +191,20 @@ class Command(BaseCommand):
                     is_banned_blitz=True if card['Banned Blitz'] == 'TRUE' else False
                 )
                 c.save()
+                supertypes = card['Super-Types'].split()
+                if supertypes != '':
+                    for supertype in supertypes:
+                        c.supertypes.add(Supertype.objects.get(name=supertype))
+                subtypes = card['Sub-Types'].split()
+                if subtypes != '':
+                    for subtype in subtypes:
+                        c.subtypes.add(Subtype.objects.get(name=subtype))
+                keywords = card['Keywords'].split('\n')
+                if keywords != '':
+                    for keyword in keywords:
+                        if keyword != '':
+                            c.keywords.add(Keyword.objects.get(name=keyword))
+                c.save()
                 self.stdout.write(self.style.SUCCESS("Card '%s' successfully created !" % c))
             except:
                 existingCard = Card.objects.get(id=card['ID'])
@@ -202,77 +216,76 @@ class Command(BaseCommand):
                 existingCard.bloc = Bloc.objects.get(name=card['Bloc'])
                 existingCard.is_banned_cc=True if card['Banned CC'] == 'TRUE' else False
                 existingCard.is_banned_blitz=True if card['Banned Blitz'] == 'TRUE' else False
+                supertypes = card['Super-Types'].split()
+                if supertypes != '':
+                    for supertype in supertypes:
+                        existingCard.supertypes.add(Supertype.objects.get(name=supertype))
+                subtypes = card['Sub-Types'].split()
+                if subtypes != '':
+                    for subtype in subtypes:
+                        existingCard.subtypes.add(Subtype.objects.get(name=subtype))
+                keywords = card['Keywords'].split('\n')
+                if keywords != '':
+                    for keyword in keywords:
+                        if keyword != '':
+                            existingCard.keywords.add(Keyword.objects.get(name=keyword))
                 existingCard.save()
                 self.stdout.write(self.style.SUCCESS("Card '%s' successfully updated !" % existingCard))
 
-            for supertype in card['Super-Types'].split():
-                if supertype != '':
+            c = Card.objects.get(id=card['ID'])
+            cardStats = c.stats.all()
+
+            if cardStats.count() == 0:
+                if card['Cost'] != '':
                     try:
-                        CardSupertype.objects.create(card=Card.objects.get(id=card['ID']), supertype=Supertype.objects.get(name=supertype))
+                        CardStat.objects.create(stat=Stat.objects.get(name='Cost'), value=card['Cost'])
                     except IntegrityError:
-                        pass
+                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Cost'))
+                        cs.value = card['Cost']
+                        cs.save()
 
-            for subtype in card['Sub-Types'].split():
-                if subtype != '':
+                if card['Pitch'] != '':
                     try:
-                        CardSubtype.objects.create(card=Card.objects.get(id=card['ID']), subtype=Subtype.objects.get(name=subtype))
+                        CardStat.objects.create(stat=Stat.objects.get(name='Pitch'), value=card['Pitch'])
                     except IntegrityError:
-                        pass
+                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Pitch'))
+                        cs.value = card['Pitch']
+                        cs.save()
 
-            for keyword in card['Keywords'].split('\n'):
-                if keyword != '':
+                if card['Power'] != '':
                     try:
-                        CardKeyword.objects.create(card=Card.objects.get(id=card['ID']), keyword=Keyword.objects.get(name=keyword))
+                        CardStat.objects.create(stat=Stat.objects.get(name='Power'), value=card['Power'])
                     except IntegrityError:
-                        pass
+                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Power'))
+                        cs.value = card['Power']
+                        cs.save()
 
-            if card['Cost'] != '':
-                try:
-                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Cost'), value=card['Cost'])
-                except IntegrityError:
-                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Cost'))
-                    cs.value = card['Cost']
-                    cs.save()
+                if card['Defense'] != '':
+                    try:
+                        CardStat.objects.create(stat=Stat.objects.get(name='Defense'), value=card['Defense'])
+                    except IntegrityError:
+                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Defense'))
+                        cs.value = card['Defense']
+                        cs.save()
 
-            if card['Pitch'] != '':
-                try:
-                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Pitch'), value=card['Pitch'])
-                except IntegrityError:
-                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Pitch'))
-                    cs.value = card['Pitch']
-                    cs.save()
+                if card['Intellect'] != '':
+                    try:
+                        CardStat.objects.create(stat=Stat.objects.get(name='Intellect'), value=card['Intellect'])
+                    except IntegrityError:
+                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Intellect'))
+                        cs.value = card['Intellect']
+                        cs.save()
 
-            if card['Power'] != '':
-                try:
-                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Power'), value=card['Power'])
-                except IntegrityError:
-                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Power'))
-                    cs.value = card['Power']
-                    cs.save()
-
-            if card['Defense'] != '':
-                try:
-                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Defense'), value=card['Defense'])
-                except IntegrityError:
-                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Defense'))
-                    cs.value = card['Defense']
-                    cs.save()
-
-            if card['Intellect'] != '':
-                try:
-                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Intellect'), value=card['Intellect'])
-                except IntegrityError:
-                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Intellect'))
-                    cs.value = card['Intellect']
-                    cs.save()
-
-            if card['Life'] != '':
-                try:
-                    CardStat.objects.create(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Life'), value=card['Life'])
-                except IntegrityError:
-                    cs = CardStat.objects.get(card=Card.objects.get(id=card['ID']), stat=Stat.objects.get(name='Life'))
-                    cs.value = card['Life']
-                    cs.save()
+                if card['Life'] != '':
+                    try:
+                        CardStat.objects.create(stat=Stat.objects.get(name='Life'), value=card['Life'])
+                    except IntegrityError:
+                        cs = CardStat.objects.get(stat=Stat.objects.get(name='Life'))
+                        cs.value = card['Life']
+                        cs.save()
+            else:
+                for cardStat in cardStats:
+                    cardStat.value = card['%s' % cardStat.name]
         
         self.stdout.write(self.style.SUCCESS("Cards added successfully !"))
 
@@ -294,8 +307,8 @@ class Command(BaseCommand):
             try:
                 cardsQueryset = Card.objects.filter(name__regex=releaseNote['Name'])
                 for card in cardsQueryset:
-                    cr = CardReleasenote.objects.create(card=card, releasenote=Releasenote.objects.get(id=releaseNote['ID']))
-                    cr.save()
+                    card.release_notes.add(Releasenote.objects.get(id=releaseNote['ID']))
+                    card.save()
             except:
                 pass
 
@@ -392,19 +405,19 @@ class Command(BaseCommand):
         if options['nodownload']:
             self.nodownload(cardsFile, printingsFile)
 
-        # self.addTalentsToDatabase(cardsFile, 'talents')
-        # self.addSupertypesToDatabase(cardsFile, 'supertypes')
-        # self.addClassesToDatabase(cardsFile, 'classes')
-        # self.addTypesToDatabase(cardsFile, 'types')
-        # self.addSubtypesToDatabase(cardsFile, 'subtypes')
-        # self.addKeywordsToDatabase(cardsFile, 'keywords')
-        # self.addBlocsToDatabase(cardsFile, 'blocs')
-        # self.addStatsToDatabase(cardsFile, 'stats')
-        # self.addCardsToDatabase(cardsFile, 'cards')
-        # self.addReleaseNotesToDatabase(cardsFile, 'release_notes')
-        # self.addFinishesToDatabase(cardsFile, 'finishes')
-        # self.addRaritiesToDatabase(cardsFile, 'rarities')
-        # self.addSetsToDatabase(cardsFile, 'sets')
+        self.addTalentsToDatabase(cardsFile, 'talents')
+        self.addSupertypesToDatabase(cardsFile, 'supertypes')
+        self.addClassesToDatabase(cardsFile, 'classes')
+        self.addTypesToDatabase(cardsFile, 'types')
+        self.addSubtypesToDatabase(cardsFile, 'subtypes')
+        self.addKeywordsToDatabase(cardsFile, 'keywords')
+        self.addBlocsToDatabase(cardsFile, 'blocs')
+        self.addStatsToDatabase(cardsFile, 'stats')
+        self.addCardsToDatabase(cardsFile, 'cards')
+        self.addReleaseNotesToDatabase(cardsFile, 'release_notes')
+        self.addFinishesToDatabase(cardsFile, 'finishes')
+        self.addRaritiesToDatabase(cardsFile, 'rarities')
+        self.addSetsToDatabase(cardsFile, 'sets')
 
         xl = pd.ExcelFile(printingsFile)
         for printing_sheet in xl.sheet_names:

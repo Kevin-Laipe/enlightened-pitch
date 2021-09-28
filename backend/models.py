@@ -1,6 +1,7 @@
 from attr import s
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.fields import related
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -43,6 +44,9 @@ class Talent(models.Model):
 class Releasenote(models.Model):
     ''' Rullings released by LSS upon a card's release '''
     text = models.TextField(max_length=5000)
+
+    def __str__(self):
+        return str(self.cards.first()).replace(' (Red)', '')
 
 class Stat(models.Model):
     '''Cost, defense, attack '''
@@ -118,12 +122,21 @@ class Printing(models.Model):
     def __str__(self):
         return self.card.name
 
+class CardStat(models.Model):
+    stat = models.ForeignKey('Stat', on_delete=models.CASCADE)
+    value = models.CharField(max_length=5)
+
 class Card(models.Model):
     name = models.CharField(max_length=50)
     text = models.TextField(max_length=1000)
-    _class = models.ForeignKey('Class', on_delete=models.CASCADE, blank=True, null=True)
-    _type = models.ForeignKey('Type', on_delete=models.CASCADE)
-    talent = models.ForeignKey('Talent', on_delete=models.CASCADE, blank=True, null=True)
+    _class = models.ForeignKey('Class', related_name='cards', on_delete=models.CASCADE, blank=True, null=True)
+    _type = models.ForeignKey('Type', related_name='cards', on_delete=models.CASCADE)
+    keywords = models.ManyToManyField(Keyword, related_name='cards', blank=True)
+    release_notes = models.ManyToManyField(Releasenote, related_name='cards', blank=True)
+    stats = models.ManyToManyField(CardStat, related_name='cards', blank=True)
+    subtypes = models.ManyToManyField(Subtype, related_name='cards', blank=True)
+    supertypes = models.ManyToManyField(Supertype, related_name='cards', blank=True)
+    talent = models.ForeignKey('Talent', related_name='cards', on_delete=models.CASCADE, blank=True, null=True)
     bloc = models.ForeignKey('Bloc', related_name='cards', on_delete=models.CASCADE)
     is_banned_cc = models.BooleanField(default=False)
     is_banned_blitz = models.BooleanField(default=False)
@@ -136,57 +149,47 @@ class Card(models.Model):
     def __str__(self):
         return self.name
 
-class CardKeyword(models.Model):
-    card = models.ForeignKey('Card', on_delete=models.CASCADE)
-    keyword = models.ForeignKey('Keyword', on_delete=models.CASCADE)
+# class CardKeyword(models.Model):
+#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
+#     keyword = models.ForeignKey('Keyword', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return "%s - %s" % (self.card, self.keyword)
+#     def __str__(self):
+#         return "%s - %s" % (self.card, self.keyword)
         
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['card', 'keyword'], name='A card cannot have the same keyword more than once')
-        ]
+#     class Meta:
+#         constraints = [
+#             models.UniqueConstraint(fields=['card', 'keyword'], name='A card cannot have the same keyword more than once')
+#         ]
 
-class CardSubtype(models.Model):
-    card = models.ForeignKey('Card', on_delete=models.CASCADE)
-    subtype = models.ForeignKey('Subtype', on_delete=models.CASCADE)
+# class CardSubtype(models.Model):
+#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
+#     subtype = models.ForeignKey('Subtype', on_delete=models.CASCADE)
         
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['card', 'subtype'], name='A card cannot have the same subtype more than once')
-        ]
+#     class Meta:
+#         constraints = [
+#             models.UniqueConstraint(fields=['card', 'subtype'], name='A card cannot have the same subtype more than once')
+#         ]
 
-class CardReleasenote(models.Model):
-    card = models.ForeignKey('Card', on_delete=models.CASCADE)
-    releasenote = models.ForeignKey('Releasenote', on_delete=models.CASCADE)
+# class CardReleasenote(models.Model):
+#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
+#     releasenote = models.ForeignKey('Releasenote', on_delete=models.CASCADE)
         
-    def __str__(self):
-        return str(self.card)
+#     def __str__(self):
+#         return str(self.card)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['card', 'releasenote'], name='A card cannot have the same release note more than once')
-        ]
+#     class Meta:
+#         constraints = [
+#             models.UniqueConstraint(fields=['card', 'releasenote'], name='A card cannot have the same release note more than once')
+#         ]
 
-class CardStat(models.Model):
-    card = models.ForeignKey('Card', on_delete=models.CASCADE)
-    stat = models.ForeignKey('Stat', on_delete=models.CASCADE)
-    value = models.CharField(max_length=5)
-        
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['card', 'stat'], name='A card cannot have the same stat more than once')
-        ]
+# class CardSupertype(models.Model):
+#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
+#     supertype = models.ForeignKey('Supertype', on_delete=models.CASCADE)
 
-class CardSupertype(models.Model):
-    card = models.ForeignKey('Card', on_delete=models.CASCADE)
-    supertype = models.ForeignKey('Supertype', on_delete=models.CASCADE)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['card', 'supertype'], name='A card cannot have the same super-type more than once')
-        ]
+#     class Meta:
+#         constraints = [
+#             models.UniqueConstraint(fields=['card', 'supertype'], name='A card cannot have the same super-type more than once')
+#         ]
 
 class Deck(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)

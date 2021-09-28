@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.db.utils import DataError, IntegrityError
 from django.contrib.auth import get_user_model
 
-from .models import Bloc, Class, Keyword, Set, Card, CardKeyword, Supertype, Subtype, Stat, Talent, Type
+from .models import Bloc, Class, Keyword, Set, Card, Supertype, Subtype, Stat, Talent, Type
 
 @pytest.fixture
 def setup():
@@ -101,15 +101,14 @@ class TestCards:
         )
         c.save()
         assert c.talent==None
-        ck1 = CardKeyword.objects.create(card=c, keyword=Keyword.objects.get(name='Go again'))
-        ck1.save()
-        assert ck1.card == c
-        assert ck1.keyword == Keyword.objects.get(name='Go again')
-        ck2 = CardKeyword.objects.create(card=c, keyword=Keyword.objects.get(name='Dominate'))
-        ck2.save()
-        assert c.cardkeyword_set.count() == 2
-        assert Keyword.objects.get(name='Go again').cardkeyword_set.count() == 1
-        assert Keyword.objects.get(name='Dominate').cardkeyword_set.count() == 1
+        c.keywords.add(Keyword.objects.get(name='Go again'))
+        c.save()
+        assert c.keywords.count() == 1
+        c.keywords.add(Keyword.objects.get(name='Dominate'))
+        c.save()
+        assert c.keywords.count() == 2
+        assert Keyword.objects.get(name='Go again').cards.count() == 1
+        assert Keyword.objects.get(name='Dominate').cards.count() == 1
 
         c2 = Card.objects.create(
             name='Head Jab',
@@ -120,14 +119,13 @@ class TestCards:
             talent=None
         )
         c2.save()
-        ck3 = CardKeyword.objects.create(card=c2, keyword=Keyword.objects.get(name='Go again'))
-        ck3.save()
-        assert c2.cardkeyword_set.count() == 1
-        assert Keyword.objects.get(name='Go again').cardkeyword_set.count() == 2
-        assert Keyword.objects.get(name='Dominate').cardkeyword_set.count() == 1
+        c2.keywords.add(Keyword.objects.get(name='Go again'))
+        c2.save()
+        assert c2.keywords.count() == 1
+        assert Keyword.objects.get(name='Go again').cards.count() == 2
+        assert Keyword.objects.get(name='Dominate').cards.count() == 1
         assert Keyword.objects.count() == 2
         assert Card.objects.count() == 2
-        assert CardKeyword.objects.count() == 3
 
     def test_talent_card_create(self):
         c = Card.objects.create(

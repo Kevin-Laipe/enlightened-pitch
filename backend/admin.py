@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import Bloc, Card, CardSupertype, Class, Finish, Printing, Rarity, Set, Keyword, Subtype, Supertype, Talent, Releasenote, Stat, CardKeyword, CardSubtype, CardReleasenote, CardStat, Type, User, Copy, Deck, DeckCard
+from .models import Bloc, Card, CardStat, Class, Finish, Printing, Rarity, Set, Keyword, Subtype, Supertype, Talent, Releasenote, Stat, Type, User, Copy, Deck, DeckCard
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
@@ -71,26 +71,6 @@ class TypeAdmin(admin.ModelAdmin):
     search_fields = ('name', )
     ordering = ('name', )
 
-class CardSupertypeInline(admin.TabularInline):
-    model = CardSupertype
-    extra = 0
-
-class CardSubtypeInline(admin.TabularInline):
-    model = CardSubtype
-    extra = 0
-
-class CardStatInline(admin.TabularInline):
-    model = CardStat
-    extra = 0
-
-class CardKeywordInline(admin.TabularInline):
-    model = CardKeyword
-    extra = 0
-
-class CardReleasenoteInline(admin.TabularInline):
-    model = CardReleasenote
-    extra = 0
-
 class CardAdmin(admin.ModelAdmin):
     model = Card
     list_display = ('name', '_type', 'id',)
@@ -101,17 +81,16 @@ class CardAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('name', 'text', ('_class', 'talent', '_type'), ('is_banned_cc', 'is_banned_blitz'), )
         }),
+        ('Stats', {
+            'fields': ('stats', 'keywords', 'subtypes', 'supertypes', )
+        }),
+        (None, {
+            'fields': ('release_notes', )
+        }),
         ('Bloc', {
             'fields': ('bloc', )
         })
     )
-    inlines = [
-        CardStatInline,
-        CardKeywordInline,
-        CardSupertypeInline,
-        CardSubtypeInline,
-        CardReleasenoteInline,
-    ]
 
 class PrintingAdmin(admin.ModelAdmin):
     model = Printing
@@ -120,11 +99,17 @@ class PrintingAdmin(admin.ModelAdmin):
     search_fields = ('card__name', 'uid', )
     ordering = ('uid', )
 
-class CardReleasenoteAdmin(admin.ModelAdmin):
-    model = CardReleasenote
-    list_display = ('card', 'id',)
-    search_fields = ('card', )
-    ordering = ('card', )
+# class ReleasenoteAdmin(admin.ModelAdmin):
+#     model = Releasenote
+#     list_display = ('card', 'id', )
+#     search_fields = ('card', )
+#     ordering = ('id', )
+
+# class CardReleasenoteAdmin(admin.ModelAdmin):
+#     model = CardReleasenote
+#     list_display = ('card', 'id',)
+#     search_fields = ('card', )
+#     ordering = ('card', )
 
 class RarityAdmin(admin.ModelAdmin):
     model = Rarity
@@ -138,6 +123,12 @@ class FinishAdmin(admin.ModelAdmin):
     search_fields = ('name', )
     ordering = ('name', )
 
+class CardStatAdmin(admin.ModelAdmin):
+    model = CardStat
+    list_display = ('cards', 'stat', 'value', )
+    search_fields = ('cards', )
+    ordering = ('cards', )
+
 admin.site.register(Card, CardAdmin)
 admin.site.register(Class, ClassAdmin)
 admin.site.register(Printing, PrintingAdmin)
@@ -149,10 +140,8 @@ admin.site.register(Talent, TalentAdmin)
 admin.site.register(Bloc, BlocAdmin)
 admin.site.register(Releasenote)
 admin.site.register(Stat, StatAdmin)
-admin.site.register(CardKeyword)
-admin.site.register(CardSubtype)
-admin.site.register(CardReleasenote, CardReleasenoteAdmin)
-admin.site.register(CardStat)
+# admin.site.register(CardReleasenote, CardReleasenoteAdmin)
+admin.site.register(CardStat, CardStatAdmin)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Copy)
 admin.site.register(Deck)
