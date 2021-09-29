@@ -233,7 +233,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("Card '%s' successfully updated !" % existingCard))
 
             c = Card.objects.get(id=card['ID'])
-            cardStats = c.stats.all()
+            cardStats = c.cardstats.all()
 
             if cardStats.count() == 0:
                 if card['Cost'] != '':
@@ -285,7 +285,7 @@ class Command(BaseCommand):
                         cs.save()
             else:
                 for cardStat in cardStats:
-                    cardStat.value = card['%s' % cardStat.name]
+                    cardStat.value = card['%s' % cardStat.stat]
         
         self.stdout.write(self.style.SUCCESS("Cards added successfully !"))
 
