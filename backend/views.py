@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, KeywordSerializer, ReleasenoteSerializer, StatSerializer, SubtypeSerializer, TalentSerializer, TypeSerializer
-from .models import Bloc, Card, CardStat, Class, Keyword, Releasenote, Stat, Subtype, Talent, Type
+from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, FinishSerializer, KeywordSerializer, PrintingSerializer, RaritySerializer, ReleasenoteSerializer, SetSerializer, StatSerializer, SubtypeSerializer, SupertypeSerializer, TalentSerializer, TypeSerializer
+from .models import Bloc, Card, CardStat, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
 
 class CardViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -59,6 +59,13 @@ class SubtypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Subtype.objects.all()
     serializer_class = SubtypeSerializer
 
+class SupertypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Supertype.
+    """
+    queryset = Supertype.objects.all()
+    serializer_class = SupertypeSerializer
+
 class StatViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint to view Stats.
@@ -72,3 +79,31 @@ class CardStatViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = CardStat.objects.all()
     serializer_class = CardStatSerializer
+
+class PrintingViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Sets.
+    """
+    queryset = Printing.objects.all()
+    serializer_class = PrintingSerializer
+
+class SetViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Sets.
+    """
+    queryset = Set.objects.all()
+    serializer_class = SetSerializer
+
+class FinishViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Finishes.
+    """
+    queryset = Finish.objects.all()
+    serializer_class = FinishSerializer
+
+class RarityViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Rarities.
+    """
+    queryset = Rarity.objects.all()
+    serializer_class = RaritySerializer

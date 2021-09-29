@@ -14,8 +14,13 @@ router.register(r'talents', views.TalentViewSet)
 router.register(r'keywords', views.KeywordViewSet)
 router.register(r'relesenotes', views.ReleasenoteViewSet)
 router.register(r'subtypes', views.SubtypeViewSet)
+router.register(r'supertypes', views.SupertypeViewSet)
 router.register(r'stats', views.StatViewSet)
 router.register(r'cardstats', views.CardStatViewSet)
+router.register(r'printings', views.PrintingViewSet)
+router.register(r'sets', views.SetViewSet)
+router.register(r'finishes', views.FinishViewSet)
+router.register(r'rarities', views.RarityViewSet)
 
 schema_view = get_schema_view(
    openapi.Info(

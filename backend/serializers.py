@@ -1,7 +1,7 @@
 from re import T
 from rest_framework import serializers
 
-from backend.models import Bloc, Card, CardStat, Class, Keyword, Releasenote, Stat, Subtype, Talent, Type
+from backend.models import Bloc, Card, CardStat, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
     keywords = serializers.HyperlinkedRelatedField(
@@ -104,4 +104,35 @@ class SubtypeSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Subtype
+        fields = '__all__'
+
+class SupertypeSerializer(serializers.HyperlinkedModelSerializer):
+    cards = serializers.HyperlinkedRelatedField(
+        many=True,
+        view_name='card-detail',
+        read_only=True
+    )
+
+    class Meta:
+        model = Supertype
+        fields = '__all__'
+
+class PrintingSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Printing
+        fields = '__all__'
+
+class SetSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Set
+        fields = '__all__'
+
+class FinishSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Finish
+        fields = '__all__'
+
+class RaritySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Rarity
         fields = '__all__'

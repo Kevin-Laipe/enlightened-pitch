@@ -149,48 +149,6 @@ class Card(models.Model):
     def __str__(self):
         return self.name
 
-# class CardKeyword(models.Model):
-#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
-#     keyword = models.ForeignKey('Keyword', on_delete=models.CASCADE)
-
-#     def __str__(self):
-#         return "%s - %s" % (self.card, self.keyword)
-        
-#     class Meta:
-#         constraints = [
-#             models.UniqueConstraint(fields=['card', 'keyword'], name='A card cannot have the same keyword more than once')
-#         ]
-
-# class CardSubtype(models.Model):
-#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
-#     subtype = models.ForeignKey('Subtype', on_delete=models.CASCADE)
-        
-#     class Meta:
-#         constraints = [
-#             models.UniqueConstraint(fields=['card', 'subtype'], name='A card cannot have the same subtype more than once')
-#         ]
-
-# class CardReleasenote(models.Model):
-#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
-#     releasenote = models.ForeignKey('Releasenote', on_delete=models.CASCADE)
-        
-#     def __str__(self):
-#         return str(self.card)
-
-#     class Meta:
-#         constraints = [
-#             models.UniqueConstraint(fields=['card', 'releasenote'], name='A card cannot have the same release note more than once')
-#         ]
-
-# class CardSupertype(models.Model):
-#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
-#     supertype = models.ForeignKey('Supertype', on_delete=models.CASCADE)
-
-#     class Meta:
-#         constraints = [
-#             models.UniqueConstraint(fields=['card', 'supertype'], name='A card cannot have the same super-type more than once')
-#         ]
-
 class Deck(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     description = models.TextField(max_length=5000)
