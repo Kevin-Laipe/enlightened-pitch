@@ -108,12 +108,19 @@ class Rarity(models.Model):
     class Meta:
         verbose_name_plural = "rarities"
 
+class Image(models.Model):
+    printings = models.CharField(max_length=15)
+    image = models.ImageField(upload_to=image_directory_path)
+    
+    def __str__(self):
+        return self.printings
+
 class Printing(models.Model):
     '''  '''
     uid = models.CharField(max_length=15, unique=True, primary_key=True)
     card = models.ForeignKey('Card', on_delete=models.CASCADE)
-    finish = models.ForeignKey('Finish',on_delete=models.CASCADE)
-    image = models.ImageField(upload_to=image_directory_path)
+    finish = models.ForeignKey('Finish', on_delete=models.CASCADE)
+    image = models.ForeignKey('Image', on_delete=models.CASCADE)
     set = models.ForeignKey('Set', on_delete=models.CASCADE)
     is_first_edition = models.BooleanField(blank=True, null=True)
     rarity = models.ForeignKey('Rarity', on_delete=models.CASCADE)

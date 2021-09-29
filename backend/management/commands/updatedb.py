@@ -1,10 +1,11 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.db.utils import Error, IntegrityError
+from django.db.utils import IntegrityError
+from django.db.models import Value, CharField, F
 import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Bloc, Card, CardStat, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
+from backend.models import Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -16,8 +17,14 @@ class Command(BaseCommand):
             action='store_false',
             help='Updates the database without downloading xls files',
         )
+        parser.add_argument(
+            '--noimages',
+            default=True,
+            action='store_false',
+            help='Updates the database without downloading images',
+        )
 
-    def nodownload(self, cardsFile, printingsFile):
+    def nodownload(self, cardsFile, printingsFile, imagesFile):
         if not os.path.exists('xls/'):
             os.mkdir('xls')
 
@@ -27,10 +34,15 @@ class Command(BaseCommand):
         if os.path.exists(printingsFile):
             os.remove(printingsFile)
 
+        if os.path.exists(imagesFile):
+            os.remove(imagesFile)
+
         cardsUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR29Sp0PHojzlOIULsrzwrXW9fCFwgFkNIoIEVWIvQPaetZYIXnQbhZ8msHd_PR2JwViA-2BNmK2Y3u/pub?output=xlsx'
         printingsUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8yCwmw7g7JW5WGzp7m_aPydcy7H6O7q1Pr6w91Dzdy3yP9Y1IxppiQriEBEtT31ZhgMcsdYwD3v1r/pub?output=xlsx'
+        imagesUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRO6KoVLk6zTAUEObeldT2OIsYAG6kQYfqWS4qY4k2Fwh0KFf9s40TSC-g9nAafoEiMDJMp_q1NbuZ5/pub?output=xlsx'
         urllib.request.urlretrieve(cardsUrl, cardsFile)
         urllib.request.urlretrieve(printingsUrl, printingsFile)
+        urllib.request.urlretrieve(imagesUrl, imagesFile)
 
     def addTalentsToDatabase(self, fileName, sheetName):
         self.stdout.write("Starting to add talents from .xls file...")
@@ -376,10 +388,10 @@ class Command(BaseCommand):
             try:
                 p = Printing.objects.create(
                     uid=printing['uid'],
-                    image=printing['Image'],
                     card=Card.objects.get(name=printing['Name']),
                     finish=Finish.objects.get(name=printing['Finish']),
                     flavour_text=printing['Flavour Text'],
+                    image=Image.objects.annotate(value=Value(printing['uid'], output_field=CharField())).filter(value__regex=F(r'%s' % 'printings')).first(),
                     rarity=Rarity.objects.get(name= printing['Rarity']),
                     set=Set.objects.get(id=printing['Set Tag']),
                     is_first_edition=printing['First Edition']
@@ -387,23 +399,49 @@ class Command(BaseCommand):
                 p.save()
             except:
                 existingPrinting = Printing.objects.get(uid=printing['uid'])
-                existingPrinting.image = printing['Image']
                 existingPrinting.card = Card.objects.get(name=printing['Name'])
                 existingPrinting.finish = Finish.objects.get(name=printing['Finish'])
                 existingPrinting.falvour_text = printing['Flavour Text']
+                existingPrinting.image = Image.objects.annotate(value=Value(printing['uid'], output_field=CharField())).filter(value__regex=F(r'%s' % 'printings')).first()
                 existingPrinting.rarity = Rarity.objects.get(name=printing['Rarity'])
                 existingPrinting.set = Set.objects.get(id=printing['Set Tag'])
                 existingPrinting.is_first_edition = printing['First Edition']
                 existingPrinting.save()
 
         self.stdout.write(self.style.SUCCESS("Printings from '%s' added successfully !" % sheetName))
+        
+    def addImagesToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add images from .xls file (sheet '%s')..." % sheetName)
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        if not os.path.exists('images/'):
+            os.mkdir('images')
+        
+        images = df.to_dict(orient='records')
+        for image in images:
+            imageFile = os.path.join('images/', image['Printings'].replace('.*', '') + '.png')
+            urllib.request.urlretrieve(image['Image'], imageFile)
+            try:
+                i = Image.objects.create(
+                    printings=image['Printings'],
+                    image=imageFile
+                )
+                i.save()
+            except:
+                existingImage = Image.objects.get(printings=image['Printings'])
+                existingImage.image=imageFile
+                existingImage.save()
+
+        self.stdout.write(self.style.SUCCESS("Images from '%s' added successfully !" % sheetName))
  
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
         printingsFile = os.path.join('xls/', 'printings.xls')
+        imagesFile = os.path.join('xls/', 'images.xls')
 
         if options['nodownload']:
-            self.nodownload(cardsFile, printingsFile)
+            self.nodownload(cardsFile, printingsFile, imagesFile)
 
         self.addTalentsToDatabase(cardsFile, 'talents')
         self.addSupertypesToDatabase(cardsFile, 'supertypes')
@@ -418,6 +456,11 @@ class Command(BaseCommand):
         self.addFinishesToDatabase(cardsFile, 'finishes')
         self.addRaritiesToDatabase(cardsFile, 'rarities')
         self.addSetsToDatabase(cardsFile, 'sets')
+
+        if options['noimages']:
+            xl = pd.ExcelFile(imagesFile)
+            for image_sheet in xl.sheet_names:
+                self.addImagesToDatabase(imagesFile, image_sheet)
 
         xl = pd.ExcelFile(printingsFile)
         for printing_sheet in xl.sheet_names:

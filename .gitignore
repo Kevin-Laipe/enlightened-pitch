@@ -314,5 +314,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-# Downloaded xls files
+# Downloaded xls files and images
 /xls

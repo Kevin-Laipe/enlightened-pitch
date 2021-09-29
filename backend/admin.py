@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import Bloc, Card, CardStat, Class, Finish, Printing, Rarity, Set, Keyword, Subtype, Supertype, Talent, Releasenote, Stat, Type, User, Copy, Deck, DeckCard
+from .models import Bloc, Card, CardStat, Class, Finish, Image, Printing, Rarity, Set, Keyword, Subtype, Supertype, Talent, Releasenote, Stat, Type, User, Copy, Deck, DeckCard
 
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
@@ -81,7 +81,7 @@ class CardAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('name', 'text', ('_class', 'talent', '_type'), ('is_banned_cc', 'is_banned_blitz'), )
         }),
-        ('Stats', {
+        (None, {
             'fields': ('keywords', 'subtypes', 'supertypes', )
         }),
         (None, {
@@ -92,9 +92,15 @@ class CardAdmin(admin.ModelAdmin):
         })
     )
 
+class ImageAdmin(admin.ModelAdmin):
+    model = Image
+    list_display = ('printings', 'image', 'id', )
+    search_fields = ('printings', )
+    ordering = ('printings', )
+
 class PrintingAdmin(admin.ModelAdmin):
     model = Printing
-    list_display = ('uid', 'card', 'rarity', 'finish', 'set', )
+    list_display = ('uid', 'card', 'rarity', 'finish', 'set', 'image', )
     list_filter = ('set', 'finish', 'rarity', )
     search_fields = ('card__name', 'uid', )
     ordering = ('uid', )
@@ -132,6 +138,7 @@ admin.site.register(CardStat, CardStatAdmin)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Copy)
 admin.site.register(Deck)
+admin.site.register(Image, ImageAdmin)
 admin.site.register(DeckCard)
 admin.site.register(Finish, FinishAdmin)
 admin.site.register(Rarity, RarityAdmin)

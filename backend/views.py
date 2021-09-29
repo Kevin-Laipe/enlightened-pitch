@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, FinishSerializer, KeywordSerializer, PrintingSerializer, RaritySerializer, ReleasenoteSerializer, SetSerializer, StatSerializer, SubtypeSerializer, SupertypeSerializer, TalentSerializer, TypeSerializer
-from .models import Bloc, Card, CardStat, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
+from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, FinishSerializer, ImageSerializer, KeywordSerializer, PrintingSerializer, RaritySerializer, ReleasenoteSerializer, SetSerializer, StatSerializer, SubtypeSerializer, SupertypeSerializer, TalentSerializer, TypeSerializer
+from .models import Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
 
 class CardViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -79,6 +79,13 @@ class CardStatViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = CardStat.objects.all()
     serializer_class = CardStatSerializer
+
+class ImageViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Images.
+    """
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
 
 class PrintingViewSet(viewsets.ReadOnlyModelViewSet):
     """

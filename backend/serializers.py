@@ -1,7 +1,8 @@
 from re import T
 from rest_framework import serializers
+from drf_extra_fields.fields import Base64ImageField
 
-from backend.models import Bloc, Card, CardStat, Class, Finish, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
+from backend.models import Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
     keywords = serializers.HyperlinkedRelatedField(
@@ -117,7 +118,16 @@ class SupertypeSerializer(serializers.HyperlinkedModelSerializer):
         model = Supertype
         fields = '__all__'
 
+class ImageSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(max_length=None)
+
+    class Meta:
+        model = Image
+        fields = '__all__'
+
 class PrintingSerializer(serializers.HyperlinkedModelSerializer):
+    image = ImageSerializer(many=False)
+
     class Meta:
         model = Printing
         fields = '__all__'

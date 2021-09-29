@@ -131,7 +131,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-public_root = root.path('public/')
+public_root = root.path('Dev/')
 
 
 # Static files (CSS, JavaScript, Images)
@@ -160,5 +160,5 @@ REST_FRAMEWORK = {
 }
 
 
-MEDIA_ROOT = public_root('media')
-MEDIA_URL = env('MEDIA_URL', default='/backend/media/')
+MEDIA_ROOT = public_root('')
+MEDIA_URL = env('MEDIA_URL', default='/backend/')

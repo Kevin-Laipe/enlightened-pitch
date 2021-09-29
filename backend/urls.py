@@ -21,6 +21,7 @@ router.register(r'printings', views.PrintingViewSet)
 router.register(r'sets', views.SetViewSet)
 router.register(r'finishes', views.FinishViewSet)
 router.register(r'rarities', views.RarityViewSet)
+router.register(r'images', views.ImageViewSet)
 
 schema_view = get_schema_view(
    openapi.Info(
