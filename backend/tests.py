@@ -2,6 +2,8 @@ import pytest
 from django.test import TestCase
 from django.db.utils import DataError, IntegrityError
 from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
 
 from .models import Bloc, Class, Keyword, Set, Card, Supertype, Subtype, Stat, Talent, Type
 
@@ -28,6 +30,18 @@ def setup():
     Bloc.objects.create(name='Welcome to Rathe', description='The og')
     Bloc.objects.create(name='Arcane Rising', description='The magical one')
 
+@pytest.mark.usefixtures('setup')
+@pytest.mark.django_db
+class TestAPI(APITestCase):
+
+    def test_get_classes(self):
+        response = self.client.get('/backend/classes/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get('/backend/classes/jdvnondaav')
+        self.assertEqual(response.status_code, status.HTTP_301_MOVED_PERMANENTLY)
+        # response = self.client.get('/backend/classes/0')
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 @pytest.mark.django_db
 class TestSets:
     def test_set_create(self):
@@ -38,9 +52,6 @@ class TestSets:
     def test_set_tag_too_long(self):
         with pytest.raises(DataError, match='.* too long .*'):
             s = Set.objects.create(name='Iorem Set', id='IOREMIPSUMAXIMUM')
-
-    def test_set_empty_fields(self):
-        pass # TODO: Use drf to ensure that empty fields won't exist in the db
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures('setup')

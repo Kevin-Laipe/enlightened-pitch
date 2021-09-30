@@ -82,7 +82,7 @@ class Type(models.Model):
 class Bloc(models.Model):
     ''' Play sets (as opposed to master sets)... '''
     name = models.CharField(max_length=30)
-    description = models.CharField(max_length=500)
+    description = models.TextField(max_length=500)
     
     def __str__(self):
         return self.name

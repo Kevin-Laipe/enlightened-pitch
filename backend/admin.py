@@ -55,9 +55,15 @@ class TalentAdmin(admin.ModelAdmin):
 
 class BlocAdmin(admin.ModelAdmin):
     model = Bloc
-    list_display = ('name', 'description', 'id',)
+    list_display = ('name', 'description', 'id', )
     search_fields = ('name', )
     ordering = ('name', )
+    readonly_fields = ('cards', )
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'description', ),
+        }),
+    )
 
 class StatAdmin(admin.ModelAdmin):
     model = Bloc
