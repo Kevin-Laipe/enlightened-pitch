@@ -415,12 +415,12 @@ class Command(BaseCommand):
         df = pd.read_excel(fileName, sheet_name=sheetName)
         df = df.fillna('')
 
-        if not os.path.exists('images/'):
-            os.mkdir('images')
+        if not os.path.exists('media/images/'):
+            os.mkdir('media/images')
         
         images = df.to_dict(orient='records')
         for image in images:
-            imageFile = os.path.join('images/', image['Printings'].replace('.*', '') + '.png')
+            imageFile = os.path.join('media/images/', image['Printings'].replace('.*', '') + '.png')
             urllib.request.urlretrieve(image['Image'], imageFile)
             try:
                 i = Image.objects.create(

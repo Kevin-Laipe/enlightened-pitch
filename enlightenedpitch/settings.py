@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
+    'drf_yasg2',
     'rest_framework',
     'backend',
 ]
@@ -160,5 +160,5 @@ REST_FRAMEWORK = {
 }
 
 
-MEDIA_ROOT = public_root('')
-MEDIA_URL = env('MEDIA_URL', default='/backend/')
+MEDIA_ROOT = public_root('media')
+MEDIA_URL = env('MEDIA_URL', default='/backend/media/')

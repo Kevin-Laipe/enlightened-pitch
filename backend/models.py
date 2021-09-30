@@ -8,7 +8,7 @@ from django.utils import timezone
 from .managers import UserManager
 
 def image_directory_path(instance, filename):
-    return 'images/{0}'.format(filename)
+    return 'media/images/{0}'.format(filename)
 
 class Set(models.Model):
     ''' Welcome to Rathe, Arcane Rising... '''

@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
 
 from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, FinishSerializer, ImageSerializer, KeywordSerializer, PrintingSerializer, RaritySerializer, ReleasenoteSerializer, SetSerializer, StatSerializer, SubtypeSerializer, SupertypeSerializer, TalentSerializer, TypeSerializer
 from .models import Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
@@ -86,6 +88,12 @@ class ImageViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
+
+    def retrieve(self, request, pk=None):
+        image = get_object_or_404(self.queryset)
+        serializer = ImageSerializer.get_image_url(image, context={'request': request})
+        print(serializer.data)
+        return Response(serializer.data)
 
 class PrintingViewSet(viewsets.ReadOnlyModelViewSet):
     """
