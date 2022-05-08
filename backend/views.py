@@ -2,8 +2,8 @@ from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, FinishSerializer, ImageSerializer, KeywordSerializer, PrintingSerializer, RaritySerializer, ReleasenoteSerializer, SetSerializer, StatSerializer, SubtypeSerializer, SupertypeSerializer, TalentSerializer, TypeSerializer
-from .models import Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
+from .serializers import BlocSerializer, CardSerializer, CardStatSerializer, ClassSerializer, FinishSerializer, ImageSerializer, KeywordSerializer, PrintingSerializer, RaritySerializer, ReleasenoteSerializer, SetSerializer, StatSerializer, SubtypeSerializer, SupertypeSerializer, TalentSerializer, TypeSerializer, ArtistSerializer, FormatSerializer
+from .models import Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type, Artist, Format
 
 class CardViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -122,3 +122,17 @@ class RarityViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Rarity.objects.all()
     serializer_class = RaritySerializer
+
+class FormatViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Formats.
+    """
+    queryset = Format.objects.all()
+    serializer_class = FormatSerializer
+
+class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to view Artists.
+    """
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer

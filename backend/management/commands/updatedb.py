@@ -1,3 +1,4 @@
+from unicodedata import name
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from django.db.models import Value, CharField, F
@@ -5,7 +6,7 @@ import pandas as pd
 import urllib.request
 import os
 
-from backend.models import Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type
+from backend.models import Banlist, Bloc, Card, CardStat, Class, Finish, Image, Keyword, Printing, Rarity, Releasenote, Set, Stat, Subtype, Supertype, Talent, Type, Artist, Format
 
 class Command(BaseCommand):
     help = 'Download the .xls file with all cards and printings data and updates the database accordingly'
@@ -377,63 +378,137 @@ class Command(BaseCommand):
                 existingSet.save()
 
         self.stdout.write(self.style.SUCCESS("Sets added successfully !"))
+
+    def addFormatsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add Formats from .xls file...")
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        formats = df.to_dict(orient='records')
+        for format in formats:
+            try:
+                f = Format.objects.create(id=format['ID'], name=format['Name'])
+                f.save()
+            except:
+                existingFormat = Format.objects.get(id=format['ID'])
+                existingFormat.name = format['Name']
+                existingFormat.save()
+
+        self.stdout.write(self.style.SUCCESS("Formats added successfully !"))
+
+    def addArtistsToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add Artists from .xls file...")
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        artists = df.to_dict(orient='records')
+        for artist in artists:
+            try:
+                a = Artist.objects.create(id=artist['ID'], name=artist['Name'], portfolio=artist['Portfolio'])
+                a.save()
+                self.stdout.write(self.style.SUCCESS("Artist '%s' added successfully !" % artist['Name']))
+            except:
+                existingArtist = Artist.objects.get(id=artist['ID'])
+                existingArtist.name = artist['Name']
+                existingArtist.portfolio = artist['Portfolio']
+                existingArtist.save()
+                self.stdout.write(self.style.SUCCESS("Artist '%s' updated successfully !" % artist['Name']))
+
+        self.stdout.write(self.style.SUCCESS("Artists added successfully !"))
+
+    def addBanlistToDatabase(self, fileName, sheetName):
+        self.stdout.write("Starting to add Banlist from .xls file...")
+        df = pd.read_excel(fileName, sheet_name=sheetName)
+        df = df.fillna('')
+
+        bans = df.to_dict(orient='records')
+        for ban in bans:
+            try:
+                b = Banlist.objects.create(
+                    id=ban['ID'],
+                    card=Card.objects.get(name=ban['Card']),
+                    isBannedInClassicConstructed=True if ban['Classic Constructed'] == 'BANNED' else False,
+                    isBannedInBlitz=True if ban['Blitz'] == 'BANNED' else False,
+                    isBannedInCommoner=True if ban['Commoner'] == 'BANNED' else False,
+                    isBannedInUltimatePitFight=True if ban['Ultimate Pit Fight'] == 'BANNED' else False
+                )
+                b.save()
+            except:
+                existingBan = Banlist.objects.get(id=ban['ID'])
+                existingBan.card = Card.objects.get(name=ban['Card'])
+                existingBan.isBannedInClassicConstructed=True if ban['Classic Constructed'] == 'BANNED' else False
+                existingBan.isBannedInBlitz=True if ban['Blitz'] == 'BANNED' else False
+                existingBan.isBannedInCommoner=True if ban['Commoner'] == 'BANNED' else False
+                existingBan.isBannedInUltimatePitFight=True if ban['Ultimate Pit Fight'] == 'BANNED' else False
+                existingBan.save()
+
+        self.stdout.write(self.style.SUCCESS("Banlist added successfully !"))
     
     def addPrintingsToDatabase(self, fileName, sheetName):
-        self.stdout.write("Starting to add printings from .xls file (sheet '%s')..." % sheetName)
-        df = pd.read_excel(fileName, sheet_name=sheetName)
-        df = df.fillna('')
+        if sheetName != "1hp_singles":
+            self.stdout.write("Starting to add printings from .xls file (sheet '%s')..." % sheetName)
+            df = pd.read_excel(fileName, sheet_name=sheetName)
+            df = df.fillna('')
 
-        printings = df.to_dict(orient='records')
-        for printing in printings:
-            try:
-                p = Printing.objects.create(
-                    uid=printing['uid'],
-                    card=Card.objects.get(name=printing['Name']),
-                    finish=Finish.objects.get(name=printing['Finish']),
-                    flavour_text=printing['Flavour Text'],
-                    image=Image.objects.annotate(value=Value(printing['uid'], output_field=CharField())).filter(value__regex=F(r'%s' % 'printings')).first(),
-                    rarity=Rarity.objects.get(name= printing['Rarity']),
-                    set=Set.objects.get(id=printing['Set Tag']),
-                    is_first_edition=printing['First Edition']
-                )
-                p.save()
-            except:
-                existingPrinting = Printing.objects.get(uid=printing['uid'])
-                existingPrinting.card = Card.objects.get(name=printing['Name'])
-                existingPrinting.finish = Finish.objects.get(name=printing['Finish'])
-                existingPrinting.falvour_text = printing['Flavour Text']
-                existingPrinting.image = Image.objects.annotate(value=Value(printing['uid'], output_field=CharField())).filter(value__regex=F(r'%s' % 'printings')).first()
-                existingPrinting.rarity = Rarity.objects.get(name=printing['Rarity'])
-                existingPrinting.set = Set.objects.get(id=printing['Set Tag'])
-                existingPrinting.is_first_edition = printing['First Edition']
-                existingPrinting.save()
+            printings = df.to_dict(orient='records')
+            for printing in printings:
+                try:
+                    p = Printing.objects.create(
+                        uid=printing['uid'],
+                        card=Card.objects.get(name=printing['Name']),
+                        finish=Finish.objects.get(name=printing['Finish']),
+                        flavour_text=printing['Flavour Text'],
+                        image=Image.objects.annotate(value=Value(printing['uid'], output_field=CharField())).filter(value__regex=F(r'%s' % 'printings')).first(),
+                        rarity=Rarity.objects.get(name= printing['Rarity']),
+                        set=Set.objects.get(id=printing['Set Tag']),
+                        is_first_edition=printing['First Edition']
+                    )
+                    p.save()
+                    self.stdout.write(self.style.SUCCESS("Printing for '%s' added successfully !" % printing['uid']))
+                except:
+                    existingPrinting = Printing.objects.get(uid=printing['uid'])
+                    existingPrinting.card = Card.objects.get(name=printing['Name'])
+                    existingPrinting.finish = Finish.objects.get(name=printing['Finish'])
+                    existingPrinting.falvour_text = printing['Flavour Text']
+                    existingPrinting.image = Image.objects.annotate(value=Value(printing['uid'], output_field=CharField())).filter(value__regex=F(r'%s' % 'printings')).first()
+                    existingPrinting.rarity = Rarity.objects.get(name=printing['Rarity'])
+                    existingPrinting.set = Set.objects.get(id=printing['Set Tag'])
+                    existingPrinting.is_first_edition = printing['First Edition']
+                    existingPrinting.save()
+                    self.stdout.write(self.style.SUCCESS("Printing for '%s' updated successfully !" % printing['uid']))
 
-        self.stdout.write(self.style.SUCCESS("Printings from '%s' added successfully !" % sheetName))
+            self.stdout.write(self.style.SUCCESS("Printings from '%s' added successfully !" % sheetName))
         
-    def addImagesToDatabase(self, fileName, sheetName):
-        self.stdout.write("Starting to add images from .xls file (sheet '%s')..." % sheetName)
-        df = pd.read_excel(fileName, sheet_name=sheetName)
-        df = df.fillna('')
+    def addImagesToDatabase(self, fileName, sheetName, downloadImages=True):
+        if sheetName != 'artists' and sheetName != "1hp_images":
+            self.stdout.write("Starting to add images from .xls file (sheet '%s')..." % sheetName)
+            df = pd.read_excel(fileName, sheet_name=sheetName)
+            df = df.fillna('')
 
-        if not os.path.exists('media/images/'):
-            os.mkdir('media/images')
-        
-        images = df.to_dict(orient='records')
-        for image in images:
-            imageFile = os.path.join('media/images/', image['Printings'].replace('.*', '') + '.png')
-            urllib.request.urlretrieve(image['Image'], imageFile)
-            try:
-                i = Image.objects.create(
-                    printings=image['Printings'],
-                    image=imageFile
-                )
-                i.save()
-            except:
-                existingImage = Image.objects.get(printings=image['Printings'])
-                existingImage.image=imageFile
-                existingImage.save()
+            if not os.path.exists('media/images/'):
+                os.mkdir('media/images')
+            
+            images = df.to_dict(orient='records')
+            for image in images:
+                imageFile = os.path.join('media/images/', image['Printings'].replace('.*', '') + '.png')
+                if downloadImages:
+                    urllib.request.urlretrieve(image['Image'], imageFile)
+                try:
+                    i = Image.objects.create(
+                        printings=image['Printings'],
+                        image=imageFile,
+                        artist=Artist.objects.get(name=image['Artist'])
+                    )
+                    i.save()
+                    self.stdout.write(self.style.SUCCESS("Image for '%s' added successfully !" % image['Printings']))
+                except:
+                    existingImage = Image.objects.get(printings=image['Printings'])
+                    existingImage.image=imageFile
+                    existingImage.artist=Artist.objects.get(name=image['Artist'])
+                    existingImage.save()
+                    self.stdout.write(self.style.SUCCESS("Image for '%s' updated successfully !" % image['Printings']))
 
-        self.stdout.write(self.style.SUCCESS("Images from '%s' added successfully !" % sheetName))
+            self.stdout.write(self.style.SUCCESS("Images from '%s' added successfully !" % sheetName))
  
     def handle(self, *args, **options):        
         cardsFile = os.path.join('xls/', 'cards.xls')
@@ -456,11 +531,13 @@ class Command(BaseCommand):
         self.addFinishesToDatabase(cardsFile, 'finishes')
         self.addRaritiesToDatabase(cardsFile, 'rarities')
         self.addSetsToDatabase(cardsFile, 'sets')
+        self.addFormatsToDatabase(cardsFile, 'formats')
+        self.addBanlistToDatabase(cardsFile, 'banlist')
 
-        if options['noimages']:
-            xl = pd.ExcelFile(imagesFile)
-            for image_sheet in xl.sheet_names:
-                self.addImagesToDatabase(imagesFile, image_sheet)
+        xl = pd.ExcelFile(imagesFile)
+        self.addArtistsToDatabase(imagesFile, 'artists')
+        for image_sheet in xl.sheet_names:
+            self.addImagesToDatabase(imagesFile, image_sheet, options['noimages'])
 
         xl = pd.ExcelFile(printingsFile)
         for printing_sheet in xl.sheet_names:

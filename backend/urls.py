@@ -22,6 +22,8 @@ router.register(r'sets', views.SetViewSet)
 router.register(r'finishes', views.FinishViewSet)
 router.register(r'rarities', views.RarityViewSet)
 router.register(r'images', views.ImageViewSet)
+router.register(r'artists', views.ArtistViewSet)
+router.register(r'formats', views.FormatViewSet)
 
 schema_view = get_schema_view(
    openapi.Info(
