@@ -17,7 +17,7 @@ import os
 root = environ.Path(__file__) - 3  # get root of the project
 env = environ.Env()
 environ.Env.read_env()  # reading .env file
-environ.Env.read_env('.config')  # reading .config file
+#environ.Env.read_env('.config')  # reading .config file
 SITE_ROUTE = root()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
