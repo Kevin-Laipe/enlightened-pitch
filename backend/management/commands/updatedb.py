@@ -445,7 +445,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Banlist added successfully !"))
     
     def addPrintingsToDatabase(self, fileName, sheetName):
-        if sheetName != "1hp_singles":
+        if sheetName != '1hp_singles':
             self.stdout.write("Starting to add printings from .xls file (sheet '%s')..." % sheetName)
             df = pd.read_excel(fileName, sheet_name=sheetName)
             df = df.fillna('')
@@ -480,7 +480,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Printings from '%s' added successfully !" % sheetName))
         
     def addImagesToDatabase(self, fileName, sheetName, downloadImages=True):
-        if sheetName != 'artists' and sheetName != "1hp_images":
+        if sheetName != 'artists' and sheetName != '1hp_images':
             self.stdout.write("Starting to add images from .xls file (sheet '%s')..." % sheetName)
             df = pd.read_excel(fileName, sheet_name=sheetName)
             df = df.fillna('')
