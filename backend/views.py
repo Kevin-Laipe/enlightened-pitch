@@ -89,12 +89,6 @@ class ImageViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
 
-    def retrieve(self, request, pk=None):
-        image = get_object_or_404(self.queryset)
-        serializer = ImageSerializer.get_image_url(image, context={'request': request})
-        print(serializer.data)
-        return Response(serializer.data)
-
 class PrintingViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint to view Sets.

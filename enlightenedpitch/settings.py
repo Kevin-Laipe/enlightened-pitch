@@ -17,7 +17,7 @@ import os
 root = environ.Path(__file__) - 3  # get root of the project
 env = environ.Env()
 environ.Env.read_env()  # reading .env file
-#environ.Env.read_env('.config')  # reading .config file
+
 SITE_ROUTE = root()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -135,6 +135,9 @@ public_root = root.path('Dev/')
 STATIC_ROOT = public_root('static')
 STATIC_URL = env('STATIC_URL', default='/static/')
 
+MEDIA_ROOT = public_root('')
+MEDIA_URL = env('MEDIA_URL', default='/backend/')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -153,6 +156,3 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
-
-MEDIA_ROOT = public_root('media')
-MEDIA_URL = env('MEDIA_URL', default='/backend/media/')
