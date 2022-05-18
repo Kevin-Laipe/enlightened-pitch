@@ -9,6 +9,8 @@ on:
 jobs:
   build:
 
+    container: node:10.18-jessie
+
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
