@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.10]
+        python-version: [3.9]
         
     services:
       postgres:
@@ -48,7 +48,7 @@ jobs:
         
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
-      run: pipenv install --dev
+      run: pipenv install --dev --${{ matrix.python-version }}
         
     - name: Connect to PostgreSQL
       run: |
