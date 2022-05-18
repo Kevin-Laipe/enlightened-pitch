@@ -48,6 +48,9 @@ jobs:
         path: ~/.local/share/virualenvs
         key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
         
+    - name: Install library for postgres
+      run: sudo apt-get install libpq-dev
+        
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
       run: pipenv install --dev --python ${{ matrix.python-version }}
