@@ -66,10 +66,8 @@ jobs:
         psql -c "ALTER USER kevin CREATEDB;" -U postgres
         psql -c "CREATE DATABASE enlightenedpitchdb;" -U postgres
       env:
-        POSTGRES_HOST: postgres
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres
-        POSTGRES_PORT: 5432
         
     - name: Set up Django project
       run: |
