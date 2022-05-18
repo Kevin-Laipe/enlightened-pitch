@@ -41,6 +41,7 @@ jobs:
         
     - name: Install Dependencies
       run: |
+        python -m ensurepip --upgrade
         pip install pipenv
         pipenv install --dev
         
