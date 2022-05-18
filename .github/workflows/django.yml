@@ -48,7 +48,7 @@ jobs:
         
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
-      run: pipenv install --dev --${{ matrix.python-version }}
+      run: pipenv install --dev --python ${{ matrix.python-version }}
         
     - name: Connect to PostgreSQL
       run: |
