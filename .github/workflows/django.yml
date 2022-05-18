@@ -1,0 +1,71 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.9]
+        
+    container: node:10.18-jessie
+        
+    services:
+      postgres:
+        image: postgres
+        
+        env:
+          POSTGRES_PASSWORD: postgres
+          
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retires 5
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pipenv install --dev
+        
+    - name: Connect to PostgreSQL
+      run: |
+        touch .env
+        echo SECRET_KEY=lba%2wx*46d$ga$2fwywc#gxyda4m589$pxbptm5rir_uuj8a2 >> .env
+        psql -c "CREATE USER kevin WITH PASSWORD 'kevin';" -U postgres
+        psql -c "ALTER USER kevin CREATEDB;" -U postgres
+        psql -c "CREATE DATABASE enlightenedpitchdb;" -U postgres
+      env:
+        POSTGRES_HOST: postgres
+        POSTGRES_PORT: 5432
+        
+    - name: Set up Django project
+      run: |
+        python manage.py makemigrations
+        python manage.py migrate
+      
+    - name: Run Tests
+      run: |
+        python manage.py test
+        
+    - name: Publish to coveralls.io
+      uses: coverallsapp/github-action@v1.1.2
+      with:
+        github-token: ${{ github.token }}
