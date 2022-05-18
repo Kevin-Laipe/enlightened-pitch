@@ -34,15 +34,17 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v3
       
+    - name: Install pipenv
+      run: pipx install pipenv
+      
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pipenv'
         
     - name: Install Dependencies
-      run: |
-        pipx install pipenv
-        pipenv install --dev
+      run: pipenv install --dev
         
     - name: Connect to PostgreSQL
       run: |
