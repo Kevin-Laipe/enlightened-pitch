@@ -40,7 +40,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         
     - name: Install Dependencies
-      run:
+      run: |
         pip install pipenv
         pipenv install --dev
         
