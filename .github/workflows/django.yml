@@ -9,8 +9,6 @@ on:
 jobs:
   build:
 
-    container: node:10.18-jessie
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -51,7 +49,10 @@ jobs:
         key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
         
     - name: Install library for postgres
-      run: sudo apt-get install libpq-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install libpq-dev
+        sudo apt-get install --yes --no-install-recommends postgresql-client
         
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
