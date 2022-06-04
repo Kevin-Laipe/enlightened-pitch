@@ -54,7 +54,6 @@ jobs:
         sudo apt-get install postgresql libpq-dev
         sudo apt-get install --yes --no-install-recommends postgresql-client
         sudo service postgresql start
-        sudo -u postgres createuser --superuser kevin
         
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
