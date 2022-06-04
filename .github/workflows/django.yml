@@ -48,11 +48,13 @@ jobs:
         path: ~/.local/share/virualenvs
         key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
         
-    - name: Install library for postgres
+    - name: Set up PostgreSQL
       run: |
         sudo apt-get update
-        sudo apt-get install libpq-dev
+        sudo apt-get install postgresql libpq-dev
         sudo apt-get install --yes --no-install-recommends postgresql-client
+        sudo service postgresql start
+        sudo -u postgres createuser --superuser kevin
         
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
